@@ -15,7 +15,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500).send({'Error': err.message});
 })
 
-app.listen(config.app.port, () => console.log('floatie listening on port ' + config.app.port));
+app.listen(process.env.PORT, () => console.log('floatie listening on port ' + process.env.PORT));
 
 mongoose.connect(config.dbUrl, function (err) { 
     if (err) throw err;
