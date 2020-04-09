@@ -16,7 +16,7 @@ const local = {
     },
     imageStorage: {
         projectId: "floatie.appspot.com",
-        keyFilename: "floatie-server/floatie-4d5f1a0743b4.json"
+        keyFilename: "float-note-server/floatie-4d5f1a0743b4.json"
     }
 };
 
@@ -35,7 +35,7 @@ const development = {
     },
     imageStorage: {
         projectId: "floatie.appspot.com",
-        keyFilename: "floatie-server/floatie-4d5f1a0743b4.json"
+        keyFilename: "float-note-server/floatie-4d5f1a0743b4.json"
     }
 };
 

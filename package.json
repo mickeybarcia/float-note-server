@@ -1,5 +1,5 @@
 {
-  "name": "floatie-server",
+  "name": "float-note-server",
   "version": "1.0.0",
   "description": "floatie main backend",
   "main": "app.js",
