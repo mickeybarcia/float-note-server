@@ -1,9 +1,11 @@
 var mongoose = require('mongoose');
+const { encrypt, decrypt } = require('../handlers/encryptor')
 
 var entrySchema = new mongoose.Schema({ 
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: [true, 'need a user id']
+        required: [true, 'need a user id'],
+        ref: 'User' 
     },
     title: {
         type: String,
@@ -15,7 +17,9 @@ var entrySchema = new mongoose.Schema({
         enum: ["text", "image", "voice"]
     },
     text: {
-        type: String,
+        type: String, 
+        get: decrypt, 
+        set: encrypt 
     },
     score: Number,
     keywords: Array,

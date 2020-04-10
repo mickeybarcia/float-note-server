@@ -1,18 +1,26 @@
 const Entry = require('../models/entry');
 
-function getEntriesByUserId(userId) {
-    return Entry.find({ userId: userId }).sort('-date').exec();
+function getEntriesByUserId(userId, resPerPage, page) {
+    return Entry.find({ userId: userId })
+        .skip((resPerPage * page) - resPerPage)
+        .limit(resPerPage)
+        .sort('-date')
+        .exec();
+}
+
+function getEntriesByUserIdAndDateRange(userId, startDate, endDate, resPerPage, page) {
+    return Entry.find({ 
+        userId: userId ,
+        date: { "$gte": startDate, "$lt": endDate }
+    })
+    .skip((resPerPage * page) - resPerPage)
+    .limit(resPerPage)
+    .sort('-date')
+    .exec();
 }
 
 function getEntryById(entryId) {
     return Entry.findById(entryId).exec();
-}
-
-function getEntriesByUserIdAndDateRange(userId, startDate, endDate) {
-    return Entry.find({ 
-        userId: userId ,
-        date: { "$gte": startDate, "$lt": endDate }
-    }).sort('-date').exec();
 }
 
 function saveEntryMetadata(userId, title, date, form) {
@@ -20,7 +28,8 @@ function saveEntryMetadata(userId, title, date, form) {
         userId : userId,
         title: title,
         date: date,
-        form: form
+        form: form,
+        text: ""
     });
 }
 

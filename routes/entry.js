@@ -1,31 +1,41 @@
 const entryService = require('../services/entry');
 const aiService = require('../services/ai');
 const storageService = require('../services/storage');
+const NotFoundError = require('../error/notFoundError')
+
+function convertModelToObject(entry) {
+    return entry.toObject({ getters: true })
+}
 
 module.exports.getEntries = async (req, res, next) => {
+    const resPerPage = 10; 
+    const page = req.params.page || 1; 
     var startDate = req.query.startDate;
     if (startDate) {
         var endDate = req.query.endDate;
         startDate = new Date(getDateFromString(startDate));
         endDate = new Date(getDateFromString(endDate));
-        entries = await entryService.getEntriesByUserIdAndDateRange(req.userId, startDate, endDate);
+        entries = await entryService.getEntriesByUserIdAndDateRange(req.userId, startDate, endDate, resPerPage, page);
     } else {
-        entries = await entryService.getEntriesByUserId(req.userId); 
+        entries = await entryService.getEntriesByUserId(req.userId, resPerPage, page); 
     }
+    entries = entries.map(function (entry) {
+        return convertModelToObject(entry)
+    });
     res.send({entries: entries});
 }
 
 function getDateFromString(dateStr) {
-    return new Date(dateStr.split("-")[0], dateStr.split("-")[1] - 1, dateStr.split("-")[2])
+    const dateSplit = dateStr.split("-")
+    return new Date(dateSplit[0], dateSplit[1] - 1, dateSplit[2])
 }
 
 module.exports.getEntry = async (req, res, next) => {
     const entry = await entryService.getEntryById(req.params.entryId);
     if (!entry) {
-        var err = new Error('Entry not found');
-        err.status = 404;
-        throw err;
+        throw new NotFoundError('Entry not found');
     }
+    entry = convertModelToObject(entry)
     res.send(entry);
 }
 
@@ -35,30 +45,32 @@ module.exports.addEntry = async (req, res, next) => {
     if (form == "text") {
         console.log("Uploading whole entry.");
         const mlRes = await aiService.analyzeEntry(form, req.body.text);
-        const entry = await entryService.saveEntry(req.userId, req.body.title, date, req.body.text, mlRes.score, form, mlRes.keywords);
-        res.location('entries/' + entry._id);
-        res.send(entry);
+        var entry = await entryService.saveEntry(req.userId, req.body.title, date, req.body.text, mlRes.score, form, mlRes.keywords);
     } else {
         console.log("Just uploading metadata.");
-        const entry = await entryService.saveEntryMetadata(req.userId, req.body.title, date, form);
-        res.location('entries/' + entry._id);
-        res.send(entry);
+        var entry = await entryService.saveEntryMetadata(req.userId, req.body.title, date, form);
     }
+    entry = convertModelToObject(entry)
+    res.location('entries/' + entry._id);
+    res.send(entry);
 }
 
 module.exports.editEntry = async (req, res, next) => {
     const entryId = req.params.entryId;
     var entry = await entryService.getEntryById(entryId);
     if (!entry) {
-        var err = new Error('Entry not found');
-        err.status = 404;
-        throw err;
+        throw new NotFoundError('Entry not found');
     }
     if (req.files != null) { // you are adding an image
-        const images = req.files;
-        await storageService.saveImages(images);
-        const mlRes = await aiService.analyzeEntryFromImages(images);
-        entry = await entryService.saveEntryAnalytics(entry, mlRes.text, mlRes.score, mlRes.keywords, images);
+        try {
+            const images = req.files;
+            await storageService.saveImages(images);
+            const mlRes = await aiService.analyzeEntryFromImages(images);
+            entry = await entryService.saveEntryAnalytics(entry, mlRes.text, mlRes.score, mlRes.keywords, images);
+        } catch(err) {  // delete the meta data if image upload fails
+            await entryService.deleteEntryById(entryId);
+            throw err;
+        }
     } else { // you are editing the entry fields
         reqForm = req.body.form;
         reqText = req.body.text;
@@ -71,6 +83,7 @@ module.exports.editEntry = async (req, res, next) => {
             entry = await entryService.editEntry(entry, req.body.title, date, reqText, entry.score, reqForm, entry.keywords);
         }
     }
+    entry = convertModelToObject(entry)
     res.location('entries/' + entry._id);                        
     res.send(entry);
 }
@@ -79,7 +92,7 @@ function getDate(dateString) {
     return !dateString ? new Date() : new Date(dateString);
 }
 
-module.exports.getEntryImage = async (req, res, next) => {
+module.exports.getEntryImage = async (req, res, next) => {  // TODO - check for permission to view image
     const file = await storageService.getImage(req.params.location);
     res.type('png') ;
     res.end(file);
@@ -89,9 +102,7 @@ module.exports.deleteEntry =  async (req, res, next) => {
     const entryId = req.params.entryId;
     var entry = await entryService.getEntryById(entryId);
     if (!entry) {
-        var err = new Error('Entry not found');
-        err.status = 404;
-        throw err;
+        throw new NotFoundError('Entry not found');
     }
     if (entry.imageUrls != null && entry.imageUrls.length !== 0) {
         entry.imageUrls.forEach(url => {

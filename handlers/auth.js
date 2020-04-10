@@ -29,13 +29,4 @@ function generateToken(userId) {
   });
 }
 
-function checkPassword(reqPassword, realPassword) {
-  //console.log('real pw: ' + realPassword)
-  return bcrypt.compareSync(reqPassword, realPassword);
-}
-
-function encryptPassword(password) {
-  return bcrypt.hashSync(password, 8);
-}
-
-module.exports = { verifyToken, generateToken, checkPassword, encryptPassword };
+module.exports = { verifyToken, generateToken };

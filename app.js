@@ -11,11 +11,12 @@ app.use(bodyParser.raw({
   limit: '100mb'
 }));
 app.use('/', routes);
+
 app.use(function (err, req, res, next) {
   res.status(err.status || 500).send({'Error': err.message});
 })
 
-app.listen(process.env.PORT, () => console.log('floatie listening on port ' + process.env.PORT));
+app.listen(config.app.port, () => console.log('floatie listening on port ' + config.app.port));
 
 mongoose.connect(config.dbUrl, function (err) { 
     if (err) throw err;

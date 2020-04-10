@@ -17,10 +17,10 @@ function saveImages(images) {
                 metadata: { contentType: file.mimetype }
             }).on('finish', async response => {
                 file.url = filename
-                await blob.makePublic()
+                await blob.makePrivate()
                 resolve(response)
             }).on('error', err => {
-                reject('upload error: ', err)
+                reject('Upload error: ', err)
             }).end(file.buffer)
         });
        promises.push(newPromise);

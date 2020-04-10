@@ -25,7 +25,7 @@ function validateLoginRequest(req, res, next) {
     const loginSchema = { 
         body: 
             Joi.object().keys({
-                userName: Joi.string().required(),
+                usernameOrEmail: Joi.string().required(),
                 password: Joi.string().required()
         })
     };
@@ -36,8 +36,9 @@ function validateRegisterRequest(req, res, next) {
     const registerSchema = { 
         body: 
             Joi.object().keys({
-                userName: Joi.string().required(),
+                username: Joi.string().required(),
                 password: Joi.string().required(),
+                email: Joi.string().regex(/\S+@\S+\.\S+/).required(),
                 age: Joi.number().required(),
                 gender: Joi.string(),
                 mentalHealthStatus: Joi.string()
@@ -59,15 +60,77 @@ function validateEntryRequest(req, res, next) {
     return validateRequest(req, res, next, entrySchema);
 }
 
-function validateEntryImageRequest(req, res, next) {
-    const entryImageSchema = { 
+function validateProfileRequest(req, res, next) {
+    const profileUpdateSchema = { 
         body: 
             Joi.object().keys({
-                userName: Joi.string().required(),
-                password: Joi.string().required()
+                gender: Joi.string(),
+                mentalHealthStatus: Joi.string()
         })
-    };
-    return validateRequest(req, res, next, entryImageSchema);
-}
+    }
+    return validateRequest(req, res, next, profileUpdateSchema);
+};
 
-module.exports = { validateLoginRequest, validateRegisterRequest, validateEntryRequest, validateEntryImageRequest };
+function validateUsernameRequest(req, res, next) {
+    const usernameUpdateSchema = { 
+        body: 
+            Joi.object().keys({
+                username: Joi.string().required()
+        })
+    }
+    return validateRequest(req, res, next, usernameUpdateSchema);
+};
+
+function validateForgotPasswordRequest(req, res, next) {
+    const forgotPasswordSchema = { 
+        body: 
+            Joi.object().keys({
+                usernameOrEmail: Joi.string().required()
+        })
+    }
+    return validateRequest(req, res, next, forgotPasswordSchema);
+};
+
+function validateUpdatePasswordRequest(req, res, next) {
+    const updatePasswordSchema = { 
+        body: 
+            Joi.object().keys({
+                usernameOrEmail: Joi.string().required(),
+                oldPassword: Joi.string().required(),
+                newPassword: Joi.string().required()
+        })
+    }
+    return validateRequest(req, res, next, updatePasswordSchema);
+};
+
+function validateEmailRequest(req, res, next) {
+    const updateEmailSchema = { 
+        body: 
+            Joi.object().keys({
+                email: Joi.string().required()
+        })
+    }
+    return validateRequest(req, res, next, updateEmailSchema);
+};
+
+function resendEmailRequest(req, res, next) {
+    const resendEmailSchema = { 
+        body: 
+            Joi.object().keys({
+                email: Joi.string().required()
+        })
+    }
+    return validateRequest(req, res, next, resendEmailSchema);
+};
+
+module.exports = { 
+    validateLoginRequest, 
+    validateRegisterRequest, 
+    validateEntryRequest, 
+    validateProfileRequest, 
+    validateUsernameRequest,
+    validateForgotPasswordRequest,
+    validateUpdatePasswordRequest,
+    validateEmailRequest,
+    resendEmailRequest
+};

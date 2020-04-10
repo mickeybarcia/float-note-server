@@ -1,7 +1,18 @@
 var router = require('express').Router();
 const { catchErrors } = require('../handlers/error');
 const { verifyToken } = require('../handlers/auth');
-const { validateLoginRequest, validateRegisterRequest, validateEntryRequest, validateEntryImageRequest } = require('../handlers/validator');
+const { 
+    validateLoginRequest, 
+    validateRegisterRequest, 
+    validateEntryRequest, 
+    validateProfileRequest, 
+    validateUsernameRequest,
+    validateForgotPasswordRequest,
+    validateUpdatePasswordRequest,
+    validateEmailRequest,
+    resendEmailRequest
+} = require('../handlers/validator');
+
 var multer  = require('multer')
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -16,13 +27,25 @@ router.get('/', function(req, res) {
 });
 
 // user API 
-router.post('/login', catchErrors(validateLoginRequest), catchErrors(userApi.login));
-router.get('/me', verifyToken, catchErrors(userApi.getCurrentUser));
-router.post('/register', catchErrors(validateRegisterRequest), catchErrors(userApi.register));
+// TODO add missing verification
+router.post('/auth/login', catchErrors(validateLoginRequest), catchErrors(userApi.login));
+router.post('/auth/register', catchErrors(validateRegisterRequest), catchErrors(userApi.register));
+router.post('/auth/forgotPassword', catchErrors(validateForgotPasswordRequest), catchErrors(userApi.forgotPassword));
+router.put('/auth/resetPassword', verifyToken,  catchErrors(validateUpdatePasswordRequest), catchErrors(userApi.updatePassword));
+
+router.get('/user', verifyToken, catchErrors(userApi.getCurrentUser));
+router.patch('/user', verifyToken, catchErrors(validateProfileRequest), catchErrors(userApi.updateProfile));
+router.post('/user/username', verifyToken, catchErrors(validateUsernameRequest), catchErrors(userApi.validateUsername));
+router.put('/user/username', verifyToken, catchErrors(validateUsernameRequest), catchErrors(userApi.updateUsername));
+router.delete('/user', verifyToken, catchErrors(userApi.deleteAccount));
+router.put('/user/email', verifyToken, catchErrors(validateEmailRequest), catchErrors(userApi.updateEmail));
+
+router.get('/verify/:token', verifyToken, catchErrors(userApi.verifyEmail));  // TODO rename
+router.post('/verify', verifyToken, catchErrors(resendEmailRequest), catchErrors(userApi.sendVerification));
 
 // entries API
 router.post('/entries', verifyToken, catchErrors(validateEntryRequest), catchErrors(entryApi.addEntry));
-router.get('/entries', verifyToken, catchErrors(entryApi.getEntries));
+router.get('/entries/:page', verifyToken, catchErrors(entryApi.getEntries));
 router.put('/entries/:entryId', verifyToken, upload.array('page', 12), catchErrors(entryApi.editEntry)); // TODO: seperate endpoint
 router.post('/entries/images', verifyToken, upload.single('page'), catchErrors(entryApi.getImageText));
 router.get('/entries/:entryId', verifyToken, catchErrors(entryApi.getEntry));

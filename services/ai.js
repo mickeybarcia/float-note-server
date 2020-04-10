@@ -11,6 +11,9 @@ function analyzeEntry(form, text) {
     return axios.post(mlApiBaseUrl + '/entry-text', {
         form: form, 
         text: text
+    }).catch((err) => {
+        var err = new Error('AI error: ' + err)
+        throw err;
     }).then((response) => {
         return response.data;
     });
@@ -26,6 +29,9 @@ async function analyzeEntryFromImages(images) {
         headers: { 
             "Content-Type": `multipart/form-data; boundary=${data._boundary}` 
         } 
+    }).catch((err) => {
+        var err = new Error('AI error: ' + err)
+        throw err;
     }).then((response) => {
         return response.data;
     });
@@ -35,6 +41,9 @@ function getEntriesSummary(text, numSentences) {
     return axios.post(mlApiBaseUrl + '/summary', {
         numSentences: numSentences,
         text: text
+    }).catch((err) => {
+        var err = new Error('AI error: ' + err)
+        throw err;
     }).then((response) => {
         return response.data;
     });
@@ -49,6 +58,9 @@ async function getImageText(image) {
             "Content-Type": `multipart/form-data; boundary=${data._boundary}` 
         }, 
         maxContentLength: 100 * 1024 * 1024
+    }).catch((err) => {
+        var err = new Error('AI error: ' + err)
+        throw err;
     }).then((response) => {
         return response.data;
     });
