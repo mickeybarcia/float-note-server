@@ -1,6 +1,7 @@
 const entryService = require('../services/entry');
 const aiService = require('../services/ai');
 const storageService = require('../services/storage');
+const { getDate, getDateFromString } = require('../util/date')
 const NotFoundError = require('../error/notFoundError')
 
 function convertModelToObject(entry) {
@@ -23,11 +24,6 @@ module.exports.getEntries = async (req, res, next) => {
         return convertModelToObject(entry)
     });
     res.send({entries: entries});
-}
-
-function getDateFromString(dateStr) {
-    const dateSplit = dateStr.split("-")
-    return new Date(dateSplit[0], dateSplit[1] - 1, dateSplit[2])
 }
 
 module.exports.getEntry = async (req, res, next) => {
@@ -86,10 +82,6 @@ module.exports.editEntry = async (req, res, next) => {
     entry = convertModelToObject(entry)
     res.location('entries/' + entry._id);                        
     res.send(entry);
-}
-
-function getDate(dateString) {
-    return !dateString ? new Date() : new Date(dateString);
 }
 
 module.exports.getEntryImage = async (req, res, next) => {  // TODO - check for permission to view image

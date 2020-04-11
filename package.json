@@ -1,12 +1,12 @@
 {
-  "name": "floatie-server",
+  "name": "floatie-note-server",
   "version": "1.0.0",
   "description": "floatie main backend",
   "main": "app.js",
   "scripts": {
     "start": "NODE_PATH= node app.js"
   },
-  "author": "",
+  "author": "mickeydbarcia",
   "license": "ISC",
   "engines": {
     "node": "10.8.0"

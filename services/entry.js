@@ -11,12 +11,19 @@ function getEntriesByUserId(userId, resPerPage, page) {
 function getEntriesByUserIdAndDateRange(userId, startDate, endDate, resPerPage, page) {
     return Entry.find({ 
         userId: userId ,
-        date: { "$gte": startDate, "$lt": endDate }
+        date: { "$gte": startDate, "$lte": endDate }
     })
     .skip((resPerPage * page) - resPerPage)
     .limit(resPerPage)
     .sort('-date')
     .exec();
+}
+
+function getAllEntriesByUserIdAndDateRange(userId, startDate, endDate) {
+    return Entry.find({ 
+        userId: userId ,
+        date: { "$gte": startDate, "$lte": endDate }
+    })
 }
 
 function getEntryById(entryId) {
@@ -75,4 +82,4 @@ function editEntry(entry, title, date, text, score, form, keywords) {
     return entry.save();
 }
 
-module.exports = { getEntriesByUserId, getEntryById, getEntriesByUserIdAndDateRange, saveEntryMetadata, saveEntry, saveEntryAnalytics, deleteEntryById, editEntry };
+module.exports = { getEntriesByUserId, getAllEntriesByUserIdAndDateRange, getEntryById, getEntriesByUserIdAndDateRange, saveEntryMetadata, saveEntry, saveEntryAnalytics, deleteEntryById, editEntry };
