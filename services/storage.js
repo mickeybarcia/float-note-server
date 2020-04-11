@@ -2,7 +2,8 @@ const {Storage} = require('@google-cloud/storage');
 const config = require('../config');
 const googleCloudStorage =  new Storage({ 
     projectId: config.imageStorage.projectId,
-    keyFilename: config.imageStorage.keyFilename
+    credentials: JSON.parse(config.imageStorage.storageKey)
+    //keyFilename: config.imageStorage.keyFilename
 });
 const bucket = googleCloudStorage.bucket(config.imageStorage.projectId);
 

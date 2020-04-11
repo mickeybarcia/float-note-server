@@ -17,7 +17,8 @@ const local = {
     },
     imageStorage: {
         projectId: "floatie.appspot.com",
-        keyFilename: "floatie-4d5f1a0743b4.json"
+        keyFilename: "floatie-4d5f1a0743b4.json",
+        storageKey: process.env.STORAGE_KEY
     }
 };
 
@@ -36,7 +37,8 @@ const development = {
     },
     imageStorage: {
         projectId: "floatie.appspot.com",
-        keyFilename: "floatie-4d5f1a0743b4.json"
+        keyFilename: "floatie-4d5f1a0743b4.json",
+        storageKey: process.env.STORAGE_KEY
     }
 };
 
@@ -54,7 +56,8 @@ const production = {
     },
     imageStorage: {
         projectId: "floatie.appspot.com",
-        keyFilename: "floatie-4d5f1a0743b4.json"
+        keyFilename: "floatie-4d5f1a0743b4.json",
+        storageKey: process.env.STORAGE_KEY
     }
 };
 
