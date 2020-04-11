@@ -10,7 +10,7 @@ const local = {
     tokenSecret: process.env.TOKEN_SECRET,
     diarySecret: process.env.DIARY_SECRET,
     testUserId: "5b776d3a30c51e3b27b5f814",
-    dbUrl: 'mongodb://floatie:gFEbDuEAsEU8Lp71@floatie-shard-00-00-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-01-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-02-rt9ey.gcp.mongodb.net:27017/test?ssl=true&replicaSet=floatie-shard-0&authSource=admin&retryWrites=true&w=majority',,
+    dbUrl: 'mongodb://floatie:gFEbDuEAsEU8Lp71@floatie-shard-00-00-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-01-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-02-rt9ey.gcp.mongodb.net:27017/test?ssl=true&replicaSet=floatie-shard-0&authSource=admin&retryWrites=true&w=majority',
     mlApi: {
         url: 'http://127.0.0.1:5000',
         key: process.env.ML_API_KEY
