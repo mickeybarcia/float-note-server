@@ -1,7 +1,7 @@
 const entryService = require('../services/entry');
 const aiService = require('../services/ai');
 const storageService = require('../services/storage');
-const { getDate, getDateFromString } = require('../util/date')
+const { getDate, getShortDate } = require('../util/date')
 const NotFoundError = require('../error/notFoundError')
 
 function convertModelToObject(entry) {
@@ -14,8 +14,8 @@ module.exports.getEntries = async (req, res, next) => {
     var startDate = req.query.startDate;
     if (startDate) {
         var endDate = req.query.endDate;
-        startDate = new Date(getDateFromString(startDate));
-        endDate = new Date(getDateFromString(endDate));
+        startDate = new Date(getShortDate(startDate));
+        endDate = new Date(getShortDate(endDate));
         entries = await entryService.getEntriesByUserIdAndDateRange(req.userId, startDate, endDate, resPerPage, page);
     } else {
         entries = await entryService.getEntriesByUserId(req.userId, resPerPage, page); 

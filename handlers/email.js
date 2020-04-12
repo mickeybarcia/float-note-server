@@ -6,7 +6,7 @@ var smtpTransport = nodemailer.createTransport({  // TODO env
     requireTLS: true,
     auth: {
         user: "floatie.ai@gmail.com",
-        pass: "Mipiaceilbooty14g!"
+        pass: "temp"
     }
 });
 

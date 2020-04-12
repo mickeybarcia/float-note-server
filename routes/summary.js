@@ -1,13 +1,13 @@
 const aiService = require('../services/ai');
 const entryService = require('../services/entry');
-const { getDateFromString } = require('../util/date')
+const { getShortDate } = require('../util/date')
 
 module.exports.getSummary = async (req, res, next) => {
     var startDate = req.query.startDate;
     if (startDate) {
         var endDate = req.query.endDate;
-        startDate = new Date(getDateFromString(startDate));
-        endDate = new Date(getDateFromString(endDate));
+        startDate = new Date(getShortDate(startDate));
+        endDate = new Date(getShortDate(endDate));
     }
     const entries = await entryService.getAllEntriesByUserIdAndDateRange(req.userId, startDate, endDate); 
     const text = getEntriesText(entries);

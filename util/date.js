@@ -1,4 +1,4 @@
-module.exports.getDateFromString = (dateStr) => {
+module.exports.getShortDate = (dateStr) => {
     const dateSplit = dateStr.split("-")
     return new Date(dateSplit[0], dateSplit[1] - 1, dateSplit[2])
 }

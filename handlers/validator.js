@@ -1,4 +1,7 @@
-const Joi = require('joi');
+const JoiBase = require("@hapi/joi");
+const JoiDate = require("@hapi/joi-date");
+
+const Joi = JoiBase.extend(JoiDate); 
 
 function validateRequest(req, res, next, requestSchema) {
     const validations = ['headers', 'params', 'query', 'body']
@@ -12,7 +15,7 @@ function validateRequest(req, res, next, requestSchema) {
         .then(result => {
             req.validated = Object.assign({},...result);
             next();
-        }).catch(validationError => {
+        }).catch(validationError => {  // TODO make error obj
             const message = validationError.details.map(d => d.message);
             console.log(message);
             var err = new Error(validationError);
@@ -47,12 +50,12 @@ function validateRegisterRequest(req, res, next) {
     return validateRequest(req, res, next, registerSchema);
 };
 
-function validateEntryRequest(req, res, next) {
+function validateCreateEntryRequest(req, res, next) {
     const entrySchema = { 
         body: 
             Joi.object().keys({
                 title: Joi.string().required(),
-                date: Joi.string(),
+                date: Joi.date().iso(),
                 form: Joi.string().required().valid('text', 'voice', 'image'),
                 text: Joi.string().empty('')
         })
@@ -113,6 +116,15 @@ function validateEmailRequest(req, res, next) {
     return validateRequest(req, res, next, updateEmailSchema);
 };
 
+function validateVerifyEmailRequest(req, res, next) {
+    const verifyEmailSchema = { 
+        params: {
+            token: Joi.string().required()
+        }
+    }
+    return validateRequest(req, res, next, verifyEmailSchema);
+};
+
 function resendEmailRequest(req, res, next) {
     const resendEmailSchema = { 
         body: 
@@ -123,7 +135,54 @@ function resendEmailRequest(req, res, next) {
     return validateRequest(req, res, next, resendEmailSchema);
 };
 
+function validateEntriesRequest(req, res, next) {
+    const entriesSchema = { 
+        query: {
+            startDate: Joi.date().format("YYYY-MM-DD"),
+            endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')),
+        },
+        params: {
+            page: Joi.number().required()
+        }        
+    }
+    return validateRequest(req, res, next, entriesSchema);
+};
+
+function validateEntryRequest(req, res, next) {
+    const entriesSchema = { 
+        params: {
+            entryId: Joi.string().required()
+        }        
+    }
+    return validateRequest(req, res, next, entriesSchema);
+};
+
+function validateEntryImageRequest(req, res, next) {
+    const entrySchema = { 
+        params: {
+            location: Joi.string().required()
+        }        
+    }
+    return validateRequest(req, res, next, entrySchema);
+};
+
+function validateSummaryRequest(req, res, next) {
+    const summarySchema = { 
+        query: {
+            startDate: Joi.date().format("YYYY-MM-DD"),
+            endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')),
+            sentences: Joi.number().required()
+        }         
+    }
+    return validateRequest(req, res, next, summarySchema);
+};
+
 module.exports = { 
+    validateCreateEntryRequest,
+    validateSummaryRequest,
+    validateEntriesRequest,
+    validateVerifyEmailRequest,
+    validateEntryImageRequest,
     validateLoginRequest, 
     validateRegisterRequest, 
     validateEntryRequest, 
