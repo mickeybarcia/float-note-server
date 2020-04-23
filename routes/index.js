@@ -61,6 +61,6 @@ router.get('/entries/images/:location', verifyToken, catchErrors(validateEntryIm
 router.delete('/entries/:entryId', verifyToken, catchErrors(validateEntryRequest), catchErrors(entryApi.deleteEntry));
 
 // summary API
-router.get('/summary', verifyToken,  catchErrors(summaryApi.getSummary));
+router.get('/summary', verifyToken, catchErrors(validateSummaryRequest), catchErrors(summaryApi.getSummary));
 
 module.exports = router;

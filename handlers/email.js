@@ -1,12 +1,13 @@
 var nodemailer = require("nodemailer");
+const config = require('../config');
 
-var smtpTransport = nodemailer.createTransport({  // TODO env
+var smtpTransport = nodemailer.createTransport({ 
     service: "Gmail",
     secure: false,
     requireTLS: true,
     auth: {
         user: "floatie.ai@gmail.com",
-        pass: "temp"
+        pass: config.emailPassword
     }
 });
 

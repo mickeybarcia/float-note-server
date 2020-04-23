@@ -1,28 +1,26 @@
 const JoiBase = require("@hapi/joi");
 const JoiDate = require("@hapi/joi-date");
+const BadRequestError = require('../error/badRequestError')
 
 const Joi = JoiBase.extend(JoiDate); 
 
-function validateRequest(req, res, next, requestSchema) {
+async function validateRequest(req, res, next, requestSchema) {
     const validations = ['headers', 'params', 'query', 'body']
         .map(key => {
             const schema = requestSchema[key];
             const value = req[key];
-            const validate = () => schema ? schema.validate(value) : Promise.resolve({});
+            const validate = () => schema ? schema.validateAsync(value) : Promise.resolve({});
             return validate().then(result => ({[key]: result}));
         });
     return Promise.all(validations)
         .then(result => {
             req.validated = Object.assign({},...result);
             next();
-        }).catch(validationError => {  // TODO make error obj
+        }).catch(validationError => {
             const message = validationError.details.map(d => d.message);
-            console.log(message);
-            var err = new Error(validationError);
-            err.status = 400;
-            throw err;
+            throw new BadRequestError(message);
         });
-};;
+};
 
 function validateLoginRequest(req, res, next) {
     const loginSchema = { 
@@ -118,9 +116,9 @@ function validateEmailRequest(req, res, next) {
 
 function validateVerifyEmailRequest(req, res, next) {
     const verifyEmailSchema = { 
-        params: {
+        params: Joi.object().keys({
             token: Joi.string().required()
-        }
+        })
     }
     return validateRequest(req, res, next, verifyEmailSchema);
 };
@@ -137,42 +135,42 @@ function resendEmailRequest(req, res, next) {
 
 function validateEntriesRequest(req, res, next) {
     const entriesSchema = { 
-        query: {
+        query: Joi.object().keys({
             startDate: Joi.date().format("YYYY-MM-DD"),
             endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')),
-        },
-        params: {
-            page: Joi.number().required()
-        }        
+        }),
+        // params: Joi.object().keys({
+        //     page: Joi.number().required()
+        // })       
     }
     return validateRequest(req, res, next, entriesSchema);
 };
 
 function validateEntryRequest(req, res, next) {
     const entriesSchema = { 
-        params: {
+        params: Joi.object().keys({
             entryId: Joi.string().required()
-        }        
+        })        
     }
     return validateRequest(req, res, next, entriesSchema);
 };
 
 function validateEntryImageRequest(req, res, next) {
     const entrySchema = { 
-        params: {
+        params: Joi.object().keys({
             location: Joi.string().required()
-        }        
+        })        
     }
     return validateRequest(req, res, next, entrySchema);
 };
 
 function validateSummaryRequest(req, res, next) {
     const summarySchema = { 
-        query: {
+        query: Joi.object().keys({
             startDate: Joi.date().format("YYYY-MM-DD"),
             endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')),
             sentences: Joi.number().required()
-        }         
+        })         
     }
     return validateRequest(req, res, next, summarySchema);
 };

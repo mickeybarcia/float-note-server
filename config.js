@@ -9,6 +9,7 @@ const local = {
     },
     tokenSecret: process.env.TOKEN_SECRET,
     diarySecret: process.env.DIARY_SECRET,
+    emailPassword: process.env.EMAIL_PASSWORD,
     testUserId: "5e7fd467745d730aabf7ece6",
     dbUrl: 'mongodb://floatie:gFEbDuEAsEU8Lp71@floatie-shard-00-00-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-01-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-02-rt9ey.gcp.mongodb.net:27017/test?ssl=true&replicaSet=floatie-shard-0&authSource=admin&retryWrites=true&w=majority',
     mlApi: {
@@ -28,6 +29,7 @@ const development = {
     },
     tokenSecret: process.env.TOKEN_SECRET,
     diarySecret: process.env.DIARY_SECRET,
+    emailPassword: process.env.EMAIL_PASSWORD,
     testUserId: "5e7fd467745d730aabf7ece6",
     dbUrl: 'mongodb://floatie:gFEbDuEAsEU8Lp71@floatie-shard-00-00-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-01-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-02-rt9ey.gcp.mongodb.net:27017/test?ssl=true&replicaSet=floatie-shard-0&authSource=admin&retryWrites=true&w=majority',
     mlApi: {
@@ -47,6 +49,7 @@ const production = {
     },
     tokenSecret: process.env.TOKEN_SECRET,
     diarySecret: process.env.DIARY_SECRET,
+    emailPassword: process.env.EMAIL_PASSWORD,
     dbUrl: 'mongodb://floatie:gFEbDuEAsEU8Lp71@floatie-shard-00-00-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-01-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-02-rt9ey.gcp.mongodb.net:27017/test?ssl=true&replicaSet=floatie-shard-0&authSource=admin&retryWrites=true&w=majority',
     mlApi: {
         url: 'https://float-note-ml-api.herokuapp.com',
