@@ -3,7 +3,7 @@ const UnAuthorizedError = require('../error/unauthorizedError')
 const NotFoundError = require('../error/notFoundError')
 const BadRequestError = require('../error/badRequestError')
 const emailHandler = require('../handlers/email')
-const { generateToken } = require('../handlers/auth')
+const { generateJWT } = require('../handlers/auth')
 const encryptor = require('../handlers/encryptor')
 const { isEmail } = require('../util/email')
 const emailTokenService = require('../services/emailToken')
@@ -28,6 +28,13 @@ function getUserByUsernameOrEmail(usernameOrEmail) {
     }
 }
 
+/**
+ * 1. Get user my username or email, otherwise unauthorized
+ * 2. Check if there is a password token and that it is correct
+ * 3. If no token, check if the password matches the user's password
+ * 4. Otherwise the password is unauthorized
+ * 5. If there's a match, send JWT
+ */
 module.exports.login = async (req, res, next) => {
     const user = await getUserByUsernameOrEmail(req.body.usernameOrEmail);
     if (!user) {
@@ -37,19 +44,28 @@ module.exports.login = async (req, res, next) => {
     if (token && encryptor.checkPassword(req.body.password, token.token)) {  // if there is a token, compare against that instead
         res.send({ validReset: true });
     } else if (!token && encryptor.checkPassword(req.body.password, user.password)) {
-        res.send({ token: generateToken(user._id) });
+        res.send({ token: generateJWT(user._id) });
     } else {
         throw new UnAuthorizedError('Password not correct');
     }
 }
 
+/**
+ * 1. Check if username exists
+ * 2. Create an encrypted data key for the user
+ * 3. Save the new user
+ * 4. Create an email token
+ * 5. Send the email
+ * 6. Send JWT
+ */
 module.exports.register = async (req, res, next) => {
     const user = await userService.getUserByUsername(req.body.username);
     if (!user) {
+        req.body.encryptedDataKey = await encryptor.generateDataKey().catch(err => { throw err })
         const user = await userService.createUser(req.body)
-        var emailToken = await emailTokenService.createEmailToken(userId)
+        var emailToken = await emailTokenService.createEmailToken(user._id, encryptor.random())
         await emailHandler.sendVerificationEmail(emailToken.token, user.email, req.headers.host);
-        res.send({ token: generateToken(user._id), isCreated: true });
+        res.send({ token: generateJWT(user._id), isCreated: true });
     } else {
         res.send({ isCreated: false });
     }
@@ -87,8 +103,10 @@ module.exports.deleteAccount = async (req, res, next) => {
 module.exports.updateEmail = async (req, res, next) => {
     await emailTokenService.deleteEmailTokenByUserId(req.userId)  // remove any previous ones in case
     const emailToken = await emailTokenService.createEmailToken(req.userId, encryptor.random())
-    await userService.updateEmail(req.userId, req.body.email)
-    await emailHandler.sendVerificationEmail(emailToken.token, req.body.email, req.headers.host);
+    await Promise.all([
+        userService.updateEmail(req.userId, req.body.email), 
+        emailHandler.sendVerificationEmail(emailToken.token, req.body.email, req.headers.host)
+    ]);
     res.sendStatus(200);
 }
 
@@ -99,8 +117,10 @@ module.exports.forgotPassword = async (req, res, next) => {
     }
     await emailTokenService.deletePasswordTokenByUserId(user._id)  // remove any previous ones in case
     const token = encryptor.random()
-    await emailTokenService.createPasswordToken(user._id, token)
-    await emailHandler.sendForgotPasswordEmail(token, user.email, req.headers.host)
+    await Promise.all([
+        emailTokenService.createPasswordToken(user._id, token),
+        emailHandler.sendForgotPasswordEmail(token, user.email, req.headers.host)
+    ]);
     res.sendStatus(200);
 }
 

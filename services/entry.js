@@ -82,4 +82,14 @@ function editEntry(entry, title, date, text, score, form, keywords) {
     return entry.save();
 }
 
-module.exports = { getEntriesByUserId, getAllEntriesByUserIdAndDateRange, getEntryById, getEntriesByUserIdAndDateRange, saveEntryMetadata, saveEntry, saveEntryAnalytics, deleteEntryById, editEntry };
+module.exports = { 
+    getEntriesByUserId, 
+    getAllEntriesByUserIdAndDateRange, 
+    getEntryById, 
+    getEntriesByUserIdAndDateRange, 
+    saveEntryMetadata, 
+    saveEntry, 
+    saveEntryAnalytics, 
+    deleteEntryById, 
+    editEntry 
+ };

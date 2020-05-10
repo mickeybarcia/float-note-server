@@ -18,8 +18,8 @@ var entrySchema = new mongoose.Schema({
     },
     text: {
         type: String, 
-        get: decrypt, 
-        set: encrypt 
+        // get: decrypt, 
+        // set: encrypt 
     },
     score: Number,
     keywords: Array,

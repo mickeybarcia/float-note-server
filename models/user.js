@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-const { encryptPassword } = require('../handlers/encryptor');
+const { encryptPassword, generate } = require('../handlers/encryptor');
 const { isEmail } = require('../util/email')
 var uniqueValidator = require('mongoose-unique-validator');
 
@@ -26,6 +26,10 @@ var userSchema = new mongoose.Schema({
     email: {
         type: String, 
         required: [true, 'email cannot be blank']
+    },
+    encryptedDataKey: {
+        type: Buffer, 
+        required: [true, 'need a data key'] 
     },
     isVerified: { 
         type: Boolean, 

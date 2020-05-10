@@ -1,15 +1,17 @@
-const {Storage} = require('@google-cloud/storage');
+const { Storage } = require('@google-cloud/storage');
 const config = require('../config');
-const googleCloudStorage =  new Storage({ 
+
+const googleCloudStorage = new Storage({ 
     projectId: config.imageStorage.projectId,
     credentials: JSON.parse(config.imageStorage.storageKey)
 });
-const bucket = googleCloudStorage.bucket(config.imageStorage.projectId);
+
+const bucket = googleCloudStorage.bucket(config.imageStorage.projectId); 
 
 function saveImages(images) {
     let promises = []
     images.forEach((file) => {
-        console.log(Math.round(file.size/1024) +'KB')
+        // console.log(Math.round(file.size/1024) +'KB')
         const filename = Date.now() + file.originalname
         const blob = bucket.file(filename)
         const newPromise =  new Promise((resolve, reject) => {
@@ -20,7 +22,7 @@ function saveImages(images) {
                 await blob.makePrivate()
                 resolve(response)
             }).on('error', err => {
-                reject('Upload error: ', err)
+                reject(new Error('Upload error: ' + err.message))
             }).end(file.buffer)
         });
        promises.push(newPromise);
@@ -38,8 +40,8 @@ function getImage(filename) {
 function deleteImage(filename) {
     var file = bucket.file(filename);
     file.delete().then(function(data) {
-        //const apiResponse = data[0];
-        console.log("deleted " + filename);
+        // const apiResponse = data[0];
+        // console.log("deleted " + filename);
     });
 }
 

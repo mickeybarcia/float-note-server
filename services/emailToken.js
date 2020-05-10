@@ -24,4 +24,11 @@ function deleteEmailTokenByUserId(userId) {
     return EmailToken.findOneAndDelete({ userId: userId }).exec();
 }
 
-module.exports = { deleteEmailTokenByUserId, createEmailToken, createPasswordToken, getEmailToken, getPasswordTokenByUserId, deletePasswordTokenByUserId }
+module.exports = { 
+    deleteEmailTokenByUserId, 
+    createEmailToken, 
+    createPasswordToken, 
+    getEmailToken, 
+    getPasswordTokenByUserId, 
+    deletePasswordTokenByUserId 
+}

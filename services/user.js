@@ -47,4 +47,16 @@ function deleteUserById(id) {
     return User.findByIdAndRemove(id).exec();
 }
 
-module.exports = { getUserById, getUserByIdWithPassword, updatePassword, verify, getUserByEmail, updateEmail, getUserByUsername, createUser, updateProfile, updateUsername, deleteUserById };
+module.exports = { 
+    getUserById, 
+    getUserByIdWithPassword, 
+    updatePassword, 
+    verify, 
+    getUserByEmail, 
+    updateEmail, 
+    getUserByUsername, 
+    createUser, 
+    updateProfile, 
+    updateUsername, 
+    deleteUserById 
+};

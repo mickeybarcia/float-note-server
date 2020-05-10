@@ -12,7 +12,10 @@ module.exports.catchErrors = (fn) => {
 
 function logError(err, req) {
   console.log({
-    error: err,
-    // request: req
+    error: err.message,
+    stack: err.stack,
+    body: JSON.stringify(req.body),
+    method: req.method,
+    url: req.originalUrl
   });
 }

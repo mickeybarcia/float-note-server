@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-const bcrypt = require('bcryptjs')
 
 function verifyToken(req, res, next) {
   if (config.env == 'production') {
@@ -23,10 +22,10 @@ function verifyToken(req, res, next) {
   }
 }
 
-function generateToken(userId) {
+function generateJWT(userId) {
   return jwt.sign({ id: userId }, config.tokenSecret, {
     expiresIn: 86400
   });
 }
 
-module.exports = { verifyToken, generateToken };
+module.exports = { verifyToken, generateJWT };
