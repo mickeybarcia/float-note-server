@@ -12,7 +12,7 @@ const local = {
     testUserId: "5eaf74b55bbe4c20ea419b98",
     dbUrl: 'mongodb://app-user:' + process.env.DB_PASSWORD + '@floatie-shard-00-00-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-01-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-02-rt9ey.gcp.mongodb.net:27017/test?ssl=true&replicaSet=floatie-shard-0&authSource=admin&retryWrites=true&w=majority',
     mlApi: {
-        url:  'http://127.0.0.1:5000',
+        url: 'https://float-note-ml-api.herokuapp.com', // 'http://127.0.0.1:5000',
         key: process.env.ML_API_KEY
     },
     imageStorage: {
