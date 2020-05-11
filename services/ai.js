@@ -12,7 +12,13 @@ function analyzeEntry(form, text) {
         form: form, 
         text: text
     }).catch((err) => {
-        throw new Error('AI error: ' + (err.response && err.response.error) ? err.response.error : err.message)
+        let message;
+        if (err.response && err.response.error) {
+            message = err.response.error
+        } else {
+            message = err.message
+        }
+        throw new Error('AI error: ' + message)
     }).then((response) => {
         return response.data;
     });
@@ -29,7 +35,13 @@ async function analyzeEntryFromImages(images) {
             "Content-Type": `multipart/form-data; boundary=${data._boundary}` 
         } 
     }).catch((err) => {
-        throw new Error('AI error: ' + (err.response && err.response.error) ? err.response.error : err.message)
+        let message;
+        if (err.response && err.response.error) {
+            message = err.response.error
+        } else {
+            message = err.message
+        }
+        throw new Error('AI error: ' + message)
     }).then((response) => {
         return response.data;
     });
@@ -40,7 +52,13 @@ function getEntriesSummary(text, numSentences) {
         numSentences: numSentences,
         text: text
     }).catch((err) => {
-        throw new Error('AI error: ' + (err.response && err.response.error) ? err.response.error : err.message)
+        let message;
+        if (err.response && err.response.error) {
+            message = err.response.error
+        } else {
+            message = err.message
+        }
+        throw new Error('AI error: ' + message)
     }).then((response) => {
         return response.data;
     });
@@ -56,7 +74,13 @@ async function getImageText(image) {
         }, 
         maxContentLength: 100 * 1024 * 1024
     }).catch((err) => {
-        throw new Error('AI error: ' + (err.response && error.response.error) ? err.response.error : err.message)
+        let message;
+        if (err.response && err.response.error) {
+            message = err.response.error
+        } else {
+            message = err.message
+        }
+        throw new Error('AI error: ' + message)
     }).then((response) => {
         return response.data;
     });
