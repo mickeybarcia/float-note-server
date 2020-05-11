@@ -12,11 +12,7 @@ function analyzeEntry(form, text) {
         form: form, 
         text: text
     }).catch((err) => {
-        if (err.response.error) {
-            throw new Error('AI error: ' + err.response.error)
-        } else {
-            throw new Error('AI error: ' + err.message)
-        }
+        throw new Error('AI error: ' + (err.response && error.response.error) ? error.response.error : err.message)
     }).then((response) => {
         return response.data;
     });
@@ -33,11 +29,7 @@ async function analyzeEntryFromImages(images) {
             "Content-Type": `multipart/form-data; boundary=${data._boundary}` 
         } 
     }).catch((err) => {
-        if (err.response.error) {
-            throw new Error('AI error: ' + err.response.error)
-        } else {
-            throw new Error('AI error: ' + err.message)
-        }
+        throw new Error('AI error: ' + (err.response && error.response.error) ? error.response.error : err.message)
     }).then((response) => {
         return response.data;
     });
@@ -48,11 +40,7 @@ function getEntriesSummary(text, numSentences) {
         numSentences: numSentences,
         text: text
     }).catch((err) => {
-        if (err.response.error) {
-            throw new Error('AI error: ' + err.response.error)
-        } else {
-            throw new Error('AI error: ' + err.message)
-        }
+        throw new Error('AI error: ' + (err.response && error.response.error) ? error.response.error : err.message)
     }).then((response) => {
         return response.data;
     });
@@ -68,11 +56,7 @@ async function getImageText(image) {
         }, 
         maxContentLength: 100 * 1024 * 1024
     }).catch((err) => {
-        if (err.response.error) {
-            throw new Error('AI error: ' + err.response.error)
-        } else {
-            throw new Error('AI error: ' + err.message)
-        }
+        throw new Error('AI error: ' + (err.response && error.response.error) ? error.response.error : err.message)
     }).then((response) => {
         return response.data;
     });
