@@ -12,8 +12,11 @@ function analyzeEntry(form, text) {
         form: form, 
         text: text
     }).catch((err) => {
-        var err = new Error('AI error: ' + err)
-        throw err;
+        if (err.response.error) {
+            throw new Error('AI error: ' + err.response.error)
+        } else {
+            throw new Error('AI error: ' + err.message)
+        }
     }).then((response) => {
         return response.data;
     });
@@ -33,7 +36,7 @@ async function analyzeEntryFromImages(images) {
         if (err.response.error) {
             throw new Error('AI error: ' + err.response.error)
         } else {
-            throw new Error('AI error: ' + err.response.message)
+            throw new Error('AI error: ' + err.message)
         }
     }).then((response) => {
         return response.data;
@@ -48,7 +51,7 @@ function getEntriesSummary(text, numSentences) {
         if (err.response.error) {
             throw new Error('AI error: ' + err.response.error)
         } else {
-            throw new Error('AI error: ' + err.response.message)
+            throw new Error('AI error: ' + err.message)
         }
     }).then((response) => {
         return response.data;
@@ -68,7 +71,7 @@ async function getImageText(image) {
         if (err.response.error) {
             throw new Error('AI error: ' + err.response.error)
         } else {
-            throw new Error('AI error: ' + err.response.message)
+            throw new Error('AI error: ' + err.message)
         }
     }).then((response) => {
         return response.data;
