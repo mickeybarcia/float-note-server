@@ -30,8 +30,11 @@ async function analyzeEntryFromImages(images) {
             "Content-Type": `multipart/form-data; boundary=${data._boundary}` 
         } 
     }).catch((err) => {
-        var err = new Error('AI error: ' + err.response.error)
-        throw err;
+        if (err.response.error) {
+            throw new Error('AI error: ' + err.response.error)
+        } else {
+            throw new Error('AI error: ' + err.response.message)
+        }
     }).then((response) => {
         return response.data;
     });
@@ -42,8 +45,11 @@ function getEntriesSummary(text, numSentences) {
         numSentences: numSentences,
         text: text
     }).catch((err) => {
-        var err = new Error('AI error: ' + err.response.data.error)
-        throw err;
+        if (err.response.error) {
+            throw new Error('AI error: ' + err.response.error)
+        } else {
+            throw new Error('AI error: ' + err.response.message)
+        }
     }).then((response) => {
         return response.data;
     });
@@ -59,8 +65,11 @@ async function getImageText(image) {
         }, 
         maxContentLength: 100 * 1024 * 1024
     }).catch((err) => {
-        var err = new Error('AI error: ' + err.response.error)
-        throw err;
+        if (err.response.error) {
+            throw new Error('AI error: ' + err.response.error)
+        } else {
+            throw new Error('AI error: ' + err.response.message)
+        }
     }).then((response) => {
         return response.data;
     });
