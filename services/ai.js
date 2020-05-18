@@ -66,13 +66,13 @@ function getEntriesSummary(text, numSentences) {
 
 async function getImageText(image) {
     const page = await storageService.getImage(image.url);
-    let data = new FormData();
-    data.append("page", page, {filename: image.url});
-    return axios.post(mlApiBaseUrl + '/entry-image', data, {
+    let formData = new FormData();
+    formData.append("page", page, {filename: image.url});
+    return axios.post(mlApiBaseUrl + '/entry-image', 
+    formData, {
         headers: { 
-            "Content-Type": `multipart/form-data; boundary=${data._boundary}` 
+            "Content-Type": `multipart/form-data; boundary=${formData._boundary}`
         }, 
-        maxContentLength: 100 * 1024 * 1024
     }).catch((err) => {
         let message;
         if (err.response && err.response.error) {

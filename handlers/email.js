@@ -16,7 +16,7 @@ module.exports.sendVerificationEmail = async (token, email, host) => {
         from: 'floatie.ai@gmail.com', 
         to: email, 
         subject: 'FLOAT NOTE Account Verification Token', 
-        text: 'Hello,\n\n Please verify your account by clicking the link: \nhttp:\/\/' + host + '\/verify\/' + token + '.\n' 
+        text: 'Hello,\n\n Please verify your account by clicking the link: \nhttp:\/\/' + host + '\/api\/v1\/verify\/' + token + '.\n' 
     };
     await smtpTransport.sendMail(mailOptions)
 }

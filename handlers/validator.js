@@ -167,8 +167,8 @@ function validateEntryImageRequest(req, res, next) {
 function validateSummaryRequest(req, res, next) {
     const summarySchema = { 
         query: Joi.object().keys({
-            startDate: Joi.date().format("YYYY-MM-DD"),
-            endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')),
+            startDate: Joi.date().format("YYYY-MM-DD").required(),
+            endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')).required(),
             sentences: Joi.number().required()
         })         
     }

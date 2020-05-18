@@ -21,7 +21,7 @@ var entrySchema = new mongoose.Schema({
         // get: decrypt, 
         // set: encrypt 
     },
-    score: Number,
+    score: String,  // to encrypt
     keywords: Array,
     imageUrls:  Array
 });

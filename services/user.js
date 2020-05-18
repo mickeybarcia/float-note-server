@@ -16,8 +16,16 @@ function getUserByEmail(email) {
     return User.findOne({ email: email }).exec();
 }
 
-function createUser(data) {
-    return User.create(data);
+function createUser(username, email, encryptedDataKey, password, mentalHealthStatus, gender, age) {
+    return User.create({
+        username: username,
+        password: password,
+        email: email,
+        encryptedDataKey: encryptedDataKey,
+        mentalHealthStatus: mentalHealthStatus,
+        gender: gender,
+        age, age
+    });
 }
 
 function updatePassword(userId, password) {

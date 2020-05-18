@@ -7,16 +7,16 @@ const { generateJWT } = require('../handlers/auth')
 const encryptor = require('../handlers/encryptor')
 const { isEmail } = require('../util/email')
 const emailTokenService = require('../services/emailToken')
-
-function convertModelToObject(user) {
-    return user.toObject({ getters: true })
-}
+const { convertModelToObject, getEncryptedDataKey, getEncryptedUserValues, decryptUser } = require('../util/data')
+const { generateDataKey, decryptDataKey } = require('../services/key') 
 
 module.exports.getCurrentUser = async (req, res, next) => {
-    const user = await userService.getUserById(req.userId);
+    let user = await userService.getUserById(req.userId);
     if (!user) {
         throw new BadRequestError('User not found');
     }
+    const dataKey = await decryptDataKey(user.encryptedDataKey).catch(err => { throw err })
+    user = decryptUser(user, dataKey)
     res.send(convertModelToObject(user));
 }
 
@@ -28,20 +28,14 @@ function getUserByUsernameOrEmail(usernameOrEmail) {
     }
 }
 
-/**
- * 1. Get user my username or email, otherwise unauthorized
- * 2. Check if there is a password token and that it is correct
- * 3. If no token, check if the password matches the user's password
- * 4. Otherwise the password is unauthorized
- * 5. If there's a match, send JWT
- */
 module.exports.login = async (req, res, next) => {
     const user = await getUserByUsernameOrEmail(req.body.usernameOrEmail);
     if (!user) {
         throw new UnAuthorizedError('Username or email not correct');
     }
+    // if there is a token, compare against that instead
     const token = await emailTokenService.getPasswordTokenByUserId(user._id);
-    if (token && encryptor.checkPassword(req.body.password, token.token)) {  // if there is a token, compare against that instead
+    if (token && encryptor.checkPassword(req.body.password, token.token)) {
         res.send({ validReset: true });
     } else if (!token && encryptor.checkPassword(req.body.password, user.password)) {
         res.send({ token: generateJWT(user._id) });
@@ -50,19 +44,23 @@ module.exports.login = async (req, res, next) => {
     }
 }
 
-/**
- * 1. Check if username exists
- * 2. Create an encrypted data key for the user
- * 3. Save the new user
- * 4. Create an email token
- * 5. Send the email
- * 6. Send JWT
- */
 module.exports.register = async (req, res, next) => {
     const user = await userService.getUserByUsername(req.body.username);
     if (!user) {
-        req.body.encryptedDataKey = await encryptor.generateDataKey().catch(err => { throw err })
-        const user = await userService.createUser(req.body)
+        // encrypt user data
+        const encryptedDataKey = await generateDataKey().catch(err => { throw err })
+        const dataKey = await decryptDataKey(encryptedDataKey).catch(err => { throw err })
+        const [ encryptedGender, encryptedMentalHealthStatus ] = getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
+
+        const user = await userService.createUser(
+            req.body.username,
+            req.body.email,
+            encryptedDataKey,
+            req.body.password,
+            encryptedMentalHealthStatus,
+            encryptedGender,
+            req.body.age
+        )
         var emailToken = await emailTokenService.createEmailToken(user._id, encryptor.random())
         await emailHandler.sendVerificationEmail(emailToken.token, user.email, req.headers.host);
         res.send({ token: generateJWT(user._id), isCreated: true });
@@ -72,7 +70,18 @@ module.exports.register = async (req, res, next) => {
 }
 
 module.exports.updateProfile = async (req, res, next) => {
-    const user = await userService.updateProfile(req.userId, req.body);
+    const encryptedDataKey = await getEncryptedDataKey(req.userId)
+    const dataKey = await decryptDataKey(encryptedDataKey).catch(err => { throw err })
+    const [ encryptedGender, encryptedMentalHealthStatus ] = getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
+    let newData = {}
+    if (encryptedGender) {
+        newData.gender = encryptedGender
+    }
+    if (encryptedMentalHealthStatus) {
+        newData.mentalHealthStatus = encryptedMentalHealthStatus
+    }
+    let user = await userService.updateProfile(req.userId, newData);
+    user = decryptUser(user, dataKey)
     res.send(convertModelToObject(user));
 }
 
@@ -132,8 +141,9 @@ module.exports.updatePassword = async (req, res, next) => {
     if (!user) {
         throw new UnAuthorizedError('Username not correct');
     }
+    // if there is a token, compare against that instead
     const token = await emailTokenService.getPasswordTokenByUserId(user._id);
-    if (token && encryptor.checkPassword(req.body.oldPassword, token.token)) {  // if there is a token, compare against that instead
+    if (token && encryptor.checkPassword(req.body.oldPassword, token.token)) {  
         emailTokenService.deletePasswordTokenByUserId(user._id);
         await userService.updatePassword(user._id, req.body.newPassword)
     } else if (!token && encryptor.checkPassword(req.body.oldPassword, user.password)) {
