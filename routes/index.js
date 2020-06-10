@@ -1,3 +1,4 @@
+const multer  = require('multer')
 const { catchErrors } = require('../handlers/error');
 const { verifyToken } = require('../handlers/auth');
 const { 
@@ -19,9 +20,8 @@ const {
 const userApi = require('./user');
 const entryApi = require('./entry');
 const summaryApi = require('./summary');
-var router = require('express').Router();
-var multer  = require('multer')
 
+var router = require('express').Router();
 const upload = multer({
     storage: multer.memoryStorage(),
 });

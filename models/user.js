@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
-const { encryptPassword, generate } = require('../handlers/encryptor');
-const { isEmail } = require('../util/email')
 var uniqueValidator = require('mongoose-unique-validator');
+const { encryptPassword } = require('../handlers/encryptor');
+const { isEmail } = require('../util/email')
 
 var userSchema = new mongoose.Schema({
     username: {

@@ -1,4 +1,4 @@
-const { InfluxDB, Point, HttpError } = require('@influxdata/influxdb-client')
+const { InfluxDB, Point } = require('@influxdata/influxdb-client')
 const { hostname } = require('os')
 const config = require('../config')
 

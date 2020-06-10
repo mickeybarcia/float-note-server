@@ -16,7 +16,7 @@ const local = {
         key: process.env.ML_API_KEY
     },
     imageStorage: {
-        projectId: "floatie-staging",
+        projectId: "floatnote-staging",
         storageKey: process.env.STORAGE_KEY
     },
     kms: {
@@ -46,7 +46,7 @@ const development = {
         key: process.env.ML_API_KEY
     },
     imageStorage: {
-        projectId: "floatie-staging",
+        projectId: "floatnote-staging",
         storageKey: process.env.STORAGE_KEY
     },
     kms: {

@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-const { encrypt, decrypt } = require('../handlers/encryptor')
 
 var entrySchema = new mongoose.Schema({ 
     userId: {
@@ -21,7 +20,7 @@ var entrySchema = new mongoose.Schema({
         // get: decrypt, 
         // set: encrypt 
     },
-    score: String,  // to encrypt
+    score: String,
     keywords: Array,
     imageUrls:  Array
 });

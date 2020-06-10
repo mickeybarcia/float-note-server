@@ -5,7 +5,6 @@ const googleCloudStorage = new Storage({
     projectId: config.imageStorage.projectId,
     credentials: JSON.parse(config.imageStorage.storageKey)
 });
-
 const bucket = googleCloudStorage.bucket(config.imageStorage.projectId); 
 
 function saveImages(images) {

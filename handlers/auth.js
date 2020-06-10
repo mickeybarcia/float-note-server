@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
-function verifyToken(req, res, next) {
+module.exports.verifyToken = (req, res, next) => {
   if (config.env == 'production') {
     var token = req.headers['authorization'];
     if (!token) {
@@ -22,10 +22,6 @@ function verifyToken(req, res, next) {
   }
 }
 
-function generateJWT(userId) {
-  return jwt.sign({ id: userId }, config.tokenSecret, {
-    expiresIn: 86400
-  });
+module.exports.generateJWT = (userId) => {
+  return jwt.sign({ id: userId }, config.tokenSecret, { expiresIn: 86400 });
 }
-
-module.exports = { verifyToken, generateJWT };

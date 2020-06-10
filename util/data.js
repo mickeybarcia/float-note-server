@@ -1,7 +1,5 @@
 const userService = require('../services/user');
-const { encryptAES, decryptAES } = require('../handlers/encryptor')
-
-// filled with some temp encryption functions pending mongodb encryption
+const { encryptAes, decryptAes, encryptAesBuffer } = require('../handlers/encryptor') 
 
 function convertModelToObject(model) { 
     return model.toObject({ getters: true })
@@ -10,6 +8,12 @@ function convertModelToObject(model) {
 async function getEncryptedDataKey(userId) {
     const user = await userService.getUserById(userId)
     return user.encryptedDataKey
+}
+
+async function getDataKey(userId) {
+    const encryptedDataKey = await getEncryptedDataKey(userId)
+    const dataKey = await keyService.decryptDataKey(encryptedDataKey).catch(err => { throw err })
+    return dataKey
 }
 
 function convertEntryToPlaintext(entry, text, title, score, keywords) {
@@ -21,38 +25,46 @@ function convertEntryToPlaintext(entry, text, title, score, keywords) {
 }
 
 function decryptEntry(entry, dataKey) {
-    entry.text = decryptAES(dataKey, entry.text)
-    entry.title = decryptAES(dataKey, entry.title)
-    entry.score = decryptAES(dataKey, entry.score)
-    entry.keywords = entry.keywords.map(word => decryptAES(dataKey, word))
+    entry.text = decryptAes(dataKey, entry.text)
+    entry.title = decryptAes(dataKey, entry.title)
+    entry.score = decryptAes(dataKey, entry.score)
+    entry.keywords = entry.keywords.map(word => decryptAes(dataKey, word))
     return entry
 }
   
 function getEncryptedEntryValues(text, title, score, keywords, dataKey) {
-    const encryptedKeywords = keywords.map(word => encryptAES(dataKey, word))
+    const encryptedKeywords = keywords.map(word => encryptAes(dataKey, word))
     return [ 
-        encryptAES(dataKey, text),  
-        title ? encryptAES(dataKey, title) : null,
-        encryptAES(dataKey, score.toString()),
+        encryptAes(dataKey, text),  
+        title ? encryptAes(dataKey, title) : null,
+        encryptAes(dataKey, score.toString()),
         encryptedKeywords
     ];
 }
 
 function getEncryptedUserValues(dataKey, mentalHealthStatus, gender) {
     return [
-        gender ? encryptAES(dataKey, gender) : null,
-        mentalHealthStatus ? encryptAES(dataKey, mentalHealthStatus) : null
+        gender ? encryptAes(dataKey, gender) : null,
+        mentalHealthStatus ? encryptAes(dataKey, mentalHealthStatus) : null
     ]
 }
 
 function decryptUser(user, dataKey) {
     if (user.gender) {
-        user.gender = decryptAES(dataKey, user.gender)
+        user.gender = decryptAes(dataKey, user.gender)
     }
     if (user.mentalHealthStatus) {
-        user.mentalHealthStatus = decryptAES(dataKey, user.mentalHealthStatus)
+        user.mentalHealthStatus = decryptAes(dataKey, user.mentalHealthStatus)
     }
     return user
+}
+
+function encryptImages(images, dataKey) {
+    images = images.map(image => {
+        image.buffer = encryptAesBuffer(dataKey, image.buffer)
+        return image
+    })
+    return images
 }
 
 module.exports = { 
@@ -62,5 +74,7 @@ module.exports = {
     decryptEntry,
     getEncryptedEntryValues,
     getEncryptedUserValues,
-    decryptUser
+    decryptUser,
+    encryptImages,
+    getDataKey
 }

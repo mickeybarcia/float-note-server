@@ -1,8 +1,11 @@
 var nodemailer = require("nodemailer");
+const handlebars = require("handlebars")
 const config = require('../config');
+const fs = require("fs")
+const path = require("path")
 
 var smtpTransport = nodemailer.createTransport({ 
-    service: "Gmail",
+    service: "SendinBlue",
     secure: false,
     requireTLS: true,
     auth: {
@@ -11,22 +14,44 @@ var smtpTransport = nodemailer.createTransport({
     }
 });
 
+const TEMPLATE_DIR = path.join(__dirname + '/../templates')
+const ACCOUNT_EMAIL = 'floatie.ai@gmail.com'
+const LOGO_ATTACHMENT = {
+    filename: 'logo.png',
+    path: __dirname +'/../assets/logo.png',
+    cid: 'logo'
+}
+
+const verifyTemplateSource = fs.readFileSync(path.join(TEMPLATE_DIR, "/verifyAccount.handlebars"), "utf8")
+const verifyTemplate = handlebars.compile(verifyTemplateSource)
+
+const resetPasswordTemplateSource = fs.readFileSync(path.join(TEMPLATE_DIR, "/resetPassword.handlebars"), "utf8")
+const resetPasswordTemplate = handlebars.compile(resetPasswordTemplateSource)
+
 module.exports.sendVerificationEmail = async (token, email, host) => {
-    var mailOptions = { 
-        from: 'floatie.ai@gmail.com', 
+    const htmlToSend = verifyTemplate({ 
+        url: "http://" + host + "/api/v1/verify/" + token
+    })
+   var mailOptions = { 
+        from: ACCOUNT_EMAIL, 
         to: email, 
-        subject: 'FLOAT NOTE Account Verification Token', 
-        text: 'Hello,\n\n Please verify your account by clicking the link: \nhttp:\/\/' + host + '\/api\/v1\/verify\/' + token + '.\n' 
+        subject: 'FLOAT NOTE 🖋 Account Verification', 
+        html: htmlToSend,
+        attachments: [ LOGO_ATTACHMENT ]
     };
-    await smtpTransport.sendMail(mailOptions)
+    smtpTransport.sendMail(mailOptions)
 }
 
 module.exports.sendForgotPasswordEmail = async (token, email) => {
-    var mailOptions = { 
-        from: 'floatie.ai@gmail.com', 
+    const htmlToSend = resetPasswordTemplate({ 
+        token: token
+    })
+   var mailOptions = { 
+        from: ACCOUNT_EMAIL, 
         to: email, 
-        subject: 'FLOAT NOTE Temporary password', 
-        text: 'Hello,\n\n Please login using this temporary password ' + token 
+        subject: 'FLOAT NOTE 🖋 Password Reset', 
+        html: htmlToSend,
+        attachments: [ LOGO_ATTACHMENT ]
     };
-    await smtpTransport.sendMail(mailOptions)
+    smtpTransport.sendMail(mailOptions)
 }

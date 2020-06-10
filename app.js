@@ -22,6 +22,8 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use(express.static(__dirname + '/assets'));
+
 app.use('/api/v1', routes);
 
 app.use(function (err, req, res, next) {

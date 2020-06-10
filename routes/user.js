@@ -1,23 +1,24 @@
-const userService = require('../services/user')
+const path = require("path")
 const UnAuthorizedError = require('../error/unauthorizedError')
 const NotFoundError = require('../error/notFoundError')
 const BadRequestError = require('../error/badRequestError')
 const emailHandler = require('../handlers/email')
-const { generateJWT } = require('../handlers/auth')
 const encryptor = require('../handlers/encryptor')
-const { isEmail } = require('../util/email')
 const emailTokenService = require('../services/emailToken')
-const { convertModelToObject, getEncryptedDataKey, getEncryptedUserValues, decryptUser } = require('../util/data')
-const { generateDataKey, decryptDataKey } = require('../services/key') 
+const dataUtil = require('../util/data')
+const keyService = require('../services/key') 
+const userService = require('../services/user')
+const { generateJWT } = require('../handlers/auth')
+const { isEmail } = require('../util/email')
 
 module.exports.getCurrentUser = async (req, res, next) => {
     let user = await userService.getUserById(req.userId);
     if (!user) {
         throw new BadRequestError('User not found');
     }
-    const dataKey = await decryptDataKey(user.encryptedDataKey).catch(err => { throw err })
-    user = decryptUser(user, dataKey)
-    res.send(convertModelToObject(user));
+    const dataKey = await keyService.decryptDataKey(user.encryptedDataKey).catch(err => { throw err })
+    user = dataUtil.convertModelToObject(dataUtil.decryptUser(user, dataKey))
+    res.send(user);
 }
 
 function getUserByUsernameOrEmail(usernameOrEmail) {
@@ -44,14 +45,21 @@ module.exports.login = async (req, res, next) => {
     }
 }
 
+/**
+ * Create a user if the username is unique, 
+ * send a verification email,
+ * and return an auth token
+ */
 module.exports.register = async (req, res, next) => {
     const user = await userService.getUserByUsername(req.body.username);
+    // TODO - check email uniqueness
     if (!user) {
-        // encrypt user data
-        const encryptedDataKey = await generateDataKey().catch(err => { throw err })
-        const dataKey = await decryptDataKey(encryptedDataKey).catch(err => { throw err })
-        const [ encryptedGender, encryptedMentalHealthStatus ] = getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
-
+        const encryptedDataKey = await keyService.generateDataKey().catch(err => { throw err })
+        const dataKey = await keyService.decryptDataKey(encryptedDataKey).catch(err => { throw err })
+        const [ 
+            encryptedGender, 
+            encryptedMentalHealthStatus 
+        ] = dataUtil.getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
         const user = await userService.createUser(
             req.body.username,
             req.body.email,
@@ -63,16 +71,18 @@ module.exports.register = async (req, res, next) => {
         )
         var emailToken = await emailTokenService.createEmailToken(user._id, encryptor.random())
         await emailHandler.sendVerificationEmail(emailToken.token, user.email, req.headers.host);
-        res.send({ token: generateJWT(user._id), isCreated: true });
-    } else {
+        res.send({ 
+            token: generateJWT(user._id), 
+            isCreated: true 
+        });
+    } else { // the username is not unique, but don't send that info back directly
         res.send({ isCreated: false });
     }
 }
 
 module.exports.updateProfile = async (req, res, next) => {
-    const encryptedDataKey = await getEncryptedDataKey(req.userId)
-    const dataKey = await decryptDataKey(encryptedDataKey).catch(err => { throw err })
-    const [ encryptedGender, encryptedMentalHealthStatus ] = getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
+    const dataKey = await dataUtil.getDataKey(req.userId)
+    const [ encryptedGender, encryptedMentalHealthStatus ] = dataUtil.getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
     let newData = {}
     if (encryptedGender) {
         newData.gender = encryptedGender
@@ -81,8 +91,8 @@ module.exports.updateProfile = async (req, res, next) => {
         newData.mentalHealthStatus = encryptedMentalHealthStatus
     }
     let user = await userService.updateProfile(req.userId, newData);
-    user = decryptUser(user, dataKey)
-    res.send(convertModelToObject(user));
+    user = dataUtil.convertModelToObject(dataUtil.decryptUser(user, dataKey))
+    res.send(user);
 }
 
 module.exports.updateUsername = async (req, res, next) => {
@@ -167,7 +177,7 @@ module.exports.verifyEmail = async (req, res, next) => {
         throw new BadRequestError('Account verified already');
     }
     await userService.verify(user); 
-    res.sendStatus(200)
+    res.sendFile(path.join(__dirname, '../views/verifyAccountSuccess.html'));
 }
 
 module.exports.sendVerification = async (req, res, next) => {

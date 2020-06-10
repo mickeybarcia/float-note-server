@@ -9,19 +9,19 @@ function createPasswordToken(userId, token) {
 }
 
 function getPasswordTokenByUserId(userId) {
-    return PasswordToken.findOne({ userId: userId }).exec();
+    return PasswordToken.findOne({ userId: userId });
 }
 
 function getEmailToken(token) {
-    return EmailToken.findOne({ token: token }).exec();
+    return EmailToken.findOne({ token: token });
 }
 
 function deletePasswordTokenByUserId(userId) {
-    return PasswordToken.findOneAndDelete({ userId: userId }).exec();
+    return PasswordToken.findOneAndDelete({ userId: userId });
 }
 
 function deleteEmailTokenByUserId(userId) {
-    return EmailToken.findOneAndDelete({ userId: userId }).exec();
+    return EmailToken.findOneAndDelete({ userId: userId });
 }
 
 module.exports = { 

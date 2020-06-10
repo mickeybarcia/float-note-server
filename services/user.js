@@ -1,22 +1,30 @@
 const User = require('../models/user');
 
-function getUserById(userId) {
-    return User.findById(userId, { password: 0 }).exec();
+module.exports.getUserById = (userId) => {
+    return User.findById(userId, { password: 0 });
 }
 
-function getUserByIdWithPassword(userId) {
-    return User.findById(userId).exec();
+module.exports.getUserByIdWithPassword = (userId) => {
+    return User.findById(userId);
 }
 
-function getUserByUsername(username) {
-    return User.findOne({ username: username }).exec();
+module.exports.getUserByUsername = (username) => {
+    return User.findOne({ username: username });
 }
 
-function getUserByEmail(email) {
-    return User.findOne({ email: email }).exec();
+module.exports.getUserByEmail = (email) => {
+    return User.findOne({ email: email });
 }
 
-function createUser(username, email, encryptedDataKey, password, mentalHealthStatus, gender, age) {
+module.exports.createUser = (
+    username, 
+    email, 
+    encryptedDataKey, 
+    password, 
+    mentalHealthStatus, 
+    gender, 
+    age
+) => {
     return User.create({
         username: username,
         password: password,
@@ -28,43 +36,33 @@ function createUser(username, email, encryptedDataKey, password, mentalHealthSta
     });
 }
 
-function updatePassword(userId, password) {
+module.exports.updatePassword = (userId, password) => {
     return User.findOneAndUpdate({ _id: userId }, { $set: { password: password } })
 }
 
-function verify(user) {
-    return User.findOneAndUpdate({ _id: user._id }, { $set: { isVerified: true } }, { new: true })
+module.exports.verify = (user) => {
+    return User.findOneAndUpdate(
+        { _id: user._id },
+        { $set: { isVerified: true } }, 
+        { new: true }
+    )
 }
 
-function updateProfile(userId, newData) {
+module.exports.updateProfile = (userId, newData) => {
     return User.findOneAndUpdate({ _id: userId }, { $set: newData }, { new: true });
 }
 
-function updateUsername(userId, username) {
+module.exports.updateUsername = (userId, username) => {
     return User.findOneAndUpdate({ _id: userId }, { username: username });
 }
 
-function updateEmail(userId, email) {
+module.exports.updateEmail = (userId, email) => {
     return User.findOneAndUpdate({_id: userId}, {
         email: email,
         isVerified: false
     });
 }
 
-function deleteUserById(id) {
-    return User.findByIdAndRemove(id).exec();
+module.exports.deleteUserById = (id) => {
+    return User.findByIdAndRemove(id);
 }
-
-module.exports = { 
-    getUserById, 
-    getUserByIdWithPassword, 
-    updatePassword, 
-    verify, 
-    getUserByEmail, 
-    updateEmail, 
-    getUserByUsername, 
-    createUser, 
-    updateProfile, 
-    updateUsername, 
-    deleteUserById 
-};

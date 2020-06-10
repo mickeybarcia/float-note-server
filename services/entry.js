@@ -1,6 +1,6 @@
 const Entry = require('../models/entry');
 
-function getEntriesByUserId(userId, resPerPage, page) {
+module.exports.getEntriesByUserId = (userId, resPerPage, page) => {
     return Entry.find({ userId: userId })
         .skip((resPerPage * page) - resPerPage)
         .limit(resPerPage)
@@ -8,7 +8,7 @@ function getEntriesByUserId(userId, resPerPage, page) {
         .exec();
 }
 
-function getEntriesByUserIdAndDateRange(userId, startDate, endDate, resPerPage, page) {
+module.exports.getEntriesByUserIdAndDateRange = (userId, startDate, endDate, resPerPage, page) => {
     return Entry.find({ 
         userId: userId ,
         date: { "$gte": startDate, "$lte": endDate }
@@ -19,18 +19,18 @@ function getEntriesByUserIdAndDateRange(userId, startDate, endDate, resPerPage, 
         .exec();
 }
 
-function getAllEntriesByUserIdAndDateRange(userId, startDate, endDate) {
+module.exports.getAllEntriesByUserIdAndDateRange = (userId, startDate, endDate) => {
     return Entry.find({ 
         userId: userId ,
         date: { "$gte": startDate, "$lte": endDate }
     })
 }
 
-function getEntryById(entryId) {
+module.exports.getEntryById = (entryId) => {
     return Entry.findById(entryId).exec();
 }
 
-function saveEntryMetadata(userId, title, date, form) {
+module.exports.saveEntryMetadata = (userId, title, date, form) => {
     return Entry.create({
         userId : userId,
         title: title,
@@ -40,7 +40,7 @@ function saveEntryMetadata(userId, title, date, form) {
     });
 }
 
-function saveEntry(userId, title, date, text, score, form, keywords) {
+module.exports.saveEntry = (userId, title, date, text, score, form, keywords) => {
     return Entry.create({
         userId : userId,
         title: title,
@@ -52,21 +52,10 @@ function saveEntry(userId, title, date, text, score, form, keywords) {
     });
 }
 
-function deleteEntryById(id) {
+module.exports.deleteEntryById = (id) => {
     return Entry.findByIdAndRemove(id).exec();
 }
 
-function editEntry(entryId, newData) {
+module.exports.editEntry = (entryId, newData) => {
     return Entry.findOneAndUpdate({ _id: entryId }, { $set: newData }, { new: true });
 }
-
-module.exports = { 
-    getEntriesByUserId, 
-    getAllEntriesByUserIdAndDateRange, 
-    getEntryById, 
-    getEntriesByUserIdAndDateRange, 
-    saveEntryMetadata, 
-    saveEntry, 
-    deleteEntryById, 
-    editEntry 
- };
