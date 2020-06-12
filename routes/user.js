@@ -1,36 +1,40 @@
+/**
+ * The endpoints for authenticating, accessing, and modifying users 
+ */
+
 const path = require("path")
 const UnAuthorizedError = require('../error/unauthorizedError')
 const NotFoundError = require('../error/notFoundError')
 const BadRequestError = require('../error/badRequestError')
 const emailHandler = require('../handlers/email')
+const authHandler = require('../handlers/auth')
 const encryptor = require('../handlers/encryptor')
 const emailTokenService = require('../services/emailToken')
-const dataUtil = require('../util/data')
 const keyService = require('../services/key') 
 const userService = require('../services/user')
-const { generateJWT } = require('../handlers/auth')
-const { isEmail } = require('../util/email')
+const userUtil = require('../util/user')
 
+/**
+ * Get the user object for the authenticated user
+ */
 module.exports.getCurrentUser = async (req, res, next) => {
     let user = await userService.getUserById(req.userId);
     if (!user) {
         throw new BadRequestError('User not found');
     }
     const dataKey = await keyService.decryptDataKey(user.encryptedDataKey).catch(err => { throw err })
-    user = dataUtil.convertModelToObject(dataUtil.decryptUser(user, dataKey))
+    user = userUtil.decryptUser(user, dataKey)
+    user = userUtil.convertModelToObject(user)
     res.send(user);
 }
 
-function getUserByUsernameOrEmail(usernameOrEmail) {
-    if (!isEmail(usernameOrEmail)) {
-        return userService.getUserByUsername(usernameOrEmail);
-    } else {
-        return userService.getUserByEmail(usernameOrEmail);
-    }
-}
-
+/**
+ * Login if the username or email exists,
+ * the password or password token is correct,
+ * and return an auth token
+ */
 module.exports.login = async (req, res, next) => {
-    const user = await getUserByUsernameOrEmail(req.body.usernameOrEmail);
+    const user = await userUtil.getUserByUsernameOrEmail(req.body.usernameOrEmail);
     if (!user) {
         throw new UnAuthorizedError('Username or email not correct');
     }
@@ -39,7 +43,7 @@ module.exports.login = async (req, res, next) => {
     if (token && encryptor.checkPassword(req.body.password, token.token)) {
         res.send({ validReset: true });
     } else if (!token && encryptor.checkPassword(req.body.password, user.password)) {
-        res.send({ token: generateJWT(user._id) });
+        res.send({ token: authHandler.generateJWT(user._id) });
     } else {
         throw new UnAuthorizedError('Password not correct');
     }
@@ -57,9 +61,8 @@ module.exports.register = async (req, res, next) => {
         const encryptedDataKey = await keyService.generateDataKey().catch(err => { throw err })
         const dataKey = await keyService.decryptDataKey(encryptedDataKey).catch(err => { throw err })
         const [ 
-            encryptedGender, 
-            encryptedMentalHealthStatus 
-        ] = dataUtil.getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
+            encryptedGender, encryptedMentalHealthStatus 
+        ] = userUtil.getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
         const user = await userService.createUser(
             req.body.username,
             req.body.email,
@@ -72,7 +75,7 @@ module.exports.register = async (req, res, next) => {
         var emailToken = await emailTokenService.createEmailToken(user._id, encryptor.random())
         await emailHandler.sendVerificationEmail(emailToken.token, user.email, req.headers.host);
         res.send({ 
-            token: generateJWT(user._id), 
+            token: authHandler.generateJWT(user._id), 
             isCreated: true 
         });
     } else { // the username is not unique, but don't send that info back directly
@@ -81,8 +84,10 @@ module.exports.register = async (req, res, next) => {
 }
 
 module.exports.updateProfile = async (req, res, next) => {
-    const dataKey = await dataUtil.getDataKey(req.userId)
-    const [ encryptedGender, encryptedMentalHealthStatus ] = dataUtil.getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
+    const dataKey = await keyService.getDataKey(req.userId)
+    const [ 
+        encryptedGender, encryptedMentalHealthStatus 
+    ] = userUtil.getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
     let newData = {}
     if (encryptedGender) {
         newData.gender = encryptedGender
@@ -91,7 +96,8 @@ module.exports.updateProfile = async (req, res, next) => {
         newData.mentalHealthStatus = encryptedMentalHealthStatus
     }
     let user = await userService.updateProfile(req.userId, newData);
-    user = dataUtil.convertModelToObject(dataUtil.decryptUser(user, dataKey))
+    user = userUtil.decryptUser(user, dataKey)
+    user = userUtil.convertModelToObject(user)
     res.send(user);
 }
 
@@ -130,7 +136,7 @@ module.exports.updateEmail = async (req, res, next) => {
 }
 
 module.exports.forgotPassword = async (req, res, next) => {
-    const user = await getUserByUsernameOrEmail(req.body.usernameOrEmail);
+    const user = await userUtil.getUserByUsernameOrEmail(req.body.usernameOrEmail);
     if (!user) {
         throw new NotFoundError('User not found');
     }
@@ -147,7 +153,7 @@ module.exports.updatePassword = async (req, res, next) => {
     if (req.body.oldPassword == req.body.newPassword) {
         throw new BadRequestError('Password must be different');
     }
-    const user = await getUserByUsernameOrEmail(req.body.usernameOrEmail);
+    const user = await userUtil.getUserByUsernameOrEmail(req.body.usernameOrEmail);
     if (!user) {
         throw new UnAuthorizedError('Username not correct');
     }

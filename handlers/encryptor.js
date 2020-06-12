@@ -8,20 +8,21 @@ module.exports.random = (num=4) => {
 }
 
 module.exports.encryptAes = (key, text) => {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
-  crypted = cipher.update(text, 'utf8', 'hex');
-  crypted += cipher.final('hex');
-  return iv + crypted;
+  let iv = crypto.randomBytes(16);
+  let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return iv.toString('hex') + ':' + encrypted.toString('hex');
 } 
 
 module.exports.decryptAes = (key, text) => {
-  const iv = text.slice(0, 16);
-  text = text.slice(16);
-  var decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
-  decoded = decipher.update(text, 'hex', 'utf8');
-  decoded += decipher.final('utf8');
-  return decoded;
+  let textParts = text.split(':');
+  let iv = Buffer.from(textParts.shift(), 'hex');
+  let encryptedText = Buffer.from(textParts.join(':'), 'hex');
+  let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
 }
 
 module.exports.encryptAesBuffer = (key, buffer) => {

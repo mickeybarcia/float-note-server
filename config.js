@@ -9,7 +9,7 @@ const local = {
     },
     tokenSecret: process.env.TOKEN_SECRET,
     emailPassword: process.env.EMAIL_PASSWORD,
-    testUserId: "5ec00d5f2117f7c3b039c482",
+    testUserId: "5ee2c3956037a8380a747855",
     dbUrl: 'mongodb://app-user:' + process.env.DB_PASSWORD + '@floatie-shard-00-00-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-01-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-02-rt9ey.gcp.mongodb.net:27017/test?ssl=true&replicaSet=floatie-shard-0&authSource=admin&retryWrites=true&w=majority',
     mlApi: {
         url:  'http://127.0.0.1:5000',
@@ -39,7 +39,7 @@ const development = {
     },
     tokenSecret: process.env.TOKEN_SECRET,
     emailPassword: process.env.EMAIL_PASSWORD,
-    testUserId: "5ec00d5f2117f7c3b039c482",
+    testUserId: "5ee2c3956037a8380a747855",
     dbUrl: 'mongodb://app-user:' + process.env.DB_PASSWORD + '@floatie-shard-00-00-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-01-rt9ey.gcp.mongodb.net:27017,floatie-shard-00-02-rt9ey.gcp.mongodb.net:27017/test?ssl=true&replicaSet=floatie-shard-0&authSource=admin&retryWrites=true&w=majority',
     mlApi: {
         url: 'https://float-note-ml-api.herokuapp.com',
@@ -61,6 +61,8 @@ const development = {
         org: 'c1acf5800db9c80a',
     }
 };
+
+const test = development
 
 const production = {
     env: env,
@@ -94,6 +96,7 @@ const production = {
 const config = {
     local,
     development,
+    test,
     production
 };
 

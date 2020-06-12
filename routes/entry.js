@@ -5,7 +5,7 @@ const { getDate, getShortDate } = require('../util/date')
 const NotFoundError = require('../error/notFoundError')
 const keyService = require('../services/key');
 const encryptor = require('../handlers/encryptor')
-const dataUtil = require('../util/data')
+const entryUtil = require('../util/entry')
 
 module.exports.getEntries = async (req, res, next) => {
     const resPerPage = 10; 
@@ -17,8 +17,9 @@ module.exports.getEntries = async (req, res, next) => {
     } else {
         entries = await entryService.getEntriesByUserId(req.userId, resPerPage, page); 
     }
-    const dataKey = await dataUtil.getDataKey(req.userId)
-    entries = entries.map(entry => dataUtil.convertModelToObject(dataUtil.decryptEntry(entry, dataKey)));
+    const dataKey = await keyService.getDataKeyForUser(req.userId)
+    entries = entries.map(entry => entryUtil.decryptEntry(entry, dataKey));
+    entries = entries.map(entry => entryUtil.convertModelToObject(entry));
     res.send({ entries: entries });
 }
 
@@ -27,8 +28,9 @@ module.exports.getEntry = async (req, res, next) => {
     if (!entry) {
         throw new NotFoundError('Entry not found');
     }
-    const dataKey = await dataUtil.getDataKey(req.userId)
-    entry =  dataUtil.convertModelToObject(dataUtil.decryptEntry(entry, dataKey))
+    const dataKey = await keyService.getDataKeyForUser(req.userId)
+    entry = entryUtil.decryptEntry(entry, dataKey)
+    entry = entryUtil.convertModelToObject(entry)
     res.send(entry);
 }
 
@@ -36,7 +38,7 @@ module.exports.getEntry = async (req, res, next) => {
 module.exports.addEntry = async (req, res, next) => {
     const date = getDate(req.body.date);
     const form = req.body.form;
-    const encryptedDataKey = await dataUtil.getEncryptedDataKey(req.userId)
+    const encryptedDataKey = await keyService.getEncryptedDataKeyForUser(req.userId)
 
     // upload whole entry
     if (form == "text") { 
@@ -52,9 +54,9 @@ module.exports.addEntry = async (req, res, next) => {
             encryptedTitle, 
             encryptedScore, 
             encryptedKeywords 
-        ] = await dataUtil.getEncryptedEntryValues(req.body.text, req.body.title, mlRes.score, mlRes.keywords, dataKey)
+        ] = await entryUtil.getEncryptedEntryValues(req.body.text, req.body.title, mlRes.score, mlRes.keywords, dataKey)
         var entry = await entryService.saveEntry(req.userId, encryptedTitle, date, encryptedText, encryptedScore, form, encryptedKeywords);
-        entry = dataUtil.convertEntryToPlaintext(entry, req.body.text, req.body.title, mlRes.score.toString(), mlRes.keywords) 
+        entry = entryUtil.convertEntryToPlaintext(entry, req.body.text, req.body.title, mlRes.score.toString(), mlRes.keywords) 
 
     // just upload metadata
     } else {  
@@ -63,8 +65,8 @@ module.exports.addEntry = async (req, res, next) => {
         entry.title = req.body.title
     }
 
-    entry = dataUtil.convertModelToObject(entry)
     res.location('entries/' + entry._id);
+    entry = entryUtil.convertModelToObject(entry)
     res.send(entry);
 }
 
@@ -74,7 +76,7 @@ module.exports.editEntry = async (req, res, next) => {
     if (!entry) {
         throw new NotFoundError('Entry not found');
     }
-    const encryptedDataKey = await dataUtil.getEncryptedDataKey(req.userId)
+    const encryptedDataKey = await keyService.getEncryptedDataKeyForUser(req.userId)
 
     // you are adding an image
     if (req.files != null) { 
@@ -87,7 +89,7 @@ module.exports.editEntry = async (req, res, next) => {
             ])
             const [ 
                 encryptedText, encryptedTitle, encryptedScore, encryptedKeywords 
-            ] = dataUtil.getEncryptedEntryValues(mlRes.text, null, mlRes.score, mlRes.keywords, dataKey)
+            ] = entryUtil.getEncryptedEntryValues(mlRes.text, null, mlRes.score, mlRes.keywords, dataKey)
             entry = await entryService.editEntry(
                 entry._id, 
                 { 
@@ -97,10 +99,10 @@ module.exports.editEntry = async (req, res, next) => {
                     imageUrls: images.map(image => image.url)
                 }
             );            
-            entry = dataUtil.convertEntryToPlaintext(entry, req.body.text, encryptor.decryptAes(dataKey, entry.title), mlRes.score.toString(), mlRes.keywords) 
+            entry = entryUtil.convertEntryToPlaintext(entry, req.body.text, encryptor.decryptAes(dataKey, entry.title), mlRes.score.toString(), mlRes.keywords) 
 
             // save images
-            encryptedImages = dataUtil.encryptImages(images, dataKey)
+            encryptedImages = encryptImages(images, dataKey)
             await storageService.saveImages(images).catch(err => { throw err });
         
         // delete the meta data if image upload fails
@@ -115,14 +117,13 @@ module.exports.editEntry = async (req, res, next) => {
         reqText = req.body.text;
         reqTitle = req.body.title;
         const dataKey = await keyService.decryptDataKey(encryptedDataKey).catch(err => { throw err })
-        const currentEntry = await dataUtil.decryptEntry(entry, dataKey)
+        const currentEntry = await entryUtil.decryptEntry(entry, dataKey)
 
         // you edited the text
         if (currentEntry.text != null && reqText != null && currentEntry.text != reqText) { 
             const mlRes = await aiService.analyzeEntry(req.body.form, reqText)
-            const [ 
-                encryptedText, encryptedTitle, encryptedScore, encryptedKeywords 
-            ] = dataUtil.getEncryptedEntryValues(reqText, reqTitle, mlRes.score, mlRes.keywords, dataKey)
+            const [ encryptedText, encryptedTitle, 
+                encryptedScore, encryptedKeywords ] = entryUtil.getEncryptedEntryValues(reqText, reqTitle, mlRes.score, mlRes.keywords, dataKey)
             entry = await entryService.editEntry(
                 entry._id, 
                 { 
@@ -132,12 +133,12 @@ module.exports.editEntry = async (req, res, next) => {
                     keywords: encryptedKeywords
                 }
             );   
-            entry = dataUtil.convertEntryToPlaintext(entry, reqText, reqTitle, mlRes.score.toString(), mlRes.keywords) 
+            entry = convertEntryToPlaintext(entry, reqText, reqTitle, mlRes.score.toString(), mlRes.keywords) 
 
         // you just edited the title
         } else if (reqTitle != currentEntry.title) {  
             await entryService.editEntry(entry._id, { title: encryptor.encryptAes(dataKey, reqTitle) });   
-            entry = dataUtil.convertEntryToPlaintext(entry, reqText, reqTitle, currentEntry.score, currentEntry.keywords) 
+            entry = entryUtil.convertEntryToPlaintext(entry, reqText, reqTitle, currentEntry.score, currentEntry.keywords) 
             
         // you edited something else
         } else  { 
@@ -147,13 +148,13 @@ module.exports.editEntry = async (req, res, next) => {
         }
     }
 
-    entry = dataUtil.convertModelToObject(entry)
-    res.location('entries/' + entry._id);                        
+    res.location('entries/' + entry._id);  
+    entry = entryUtil.convertModelToObject(entry)                      
     res.send(entry);
 }
 
 module.exports.getEntryImage = async (req, res, next) => {  // TODO - check for permission to view image
-    const encryptedDataKey = await dataUtil.getEncryptedDataKey(req.userId)
+    const encryptedDataKey = await keyService.getEncryptedDataKeyForUser(req.userId)
     const [ dataKey, file ] = await Promise.all([
         keyService.decryptDataKey(encryptedDataKey).catch(err => { throw err }),
         storageService.getImage(req.params.location).catch(err => {

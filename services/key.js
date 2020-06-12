@@ -1,5 +1,6 @@
 const aws = require('aws-sdk')
 const config = require('../config');
+const userService = require('./user')
 
 const kms = new aws.KMS({
     accessKeyId: config.kms.accessKeyId,
@@ -36,6 +37,22 @@ const kms = new aws.KMS({
             }
         });
     });
-  }
+}
 
-  module.exports = { decryptDataKey, generateDataKey }
+async function getDataKeyForUser(userId) {
+    const encryptedDataKey = await getEncryptedDataKeyForUser(userId)
+    const dataKey = await decryptDataKey(encryptedDataKey).catch(err => { throw err })
+    return dataKey
+}
+
+async function getEncryptedDataKeyForUser(userId) {
+    const user = await userService.getUserById(userId)
+    return user.encryptedDataKey
+}
+
+module.exports = { 
+    decryptDataKey, 
+    generateDataKey, 
+    getDataKeyForUser, 
+    getEncryptedDataKeyForUser 
+}
