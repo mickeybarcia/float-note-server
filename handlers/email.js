@@ -1,21 +1,26 @@
+/**
+ * Handles account emails
+ */
+
 var nodemailer = require("nodemailer");
 const handlebars = require("handlebars")
-const config = require('../config');
 const fs = require("fs")
 const path = require("path")
+const config = require('../config');
+
+const ACCOUNT_EMAIL = 'floatie.ai@gmail.com'
 
 var smtpTransport = nodemailer.createTransport({ 
     service: "SendinBlue",
-    secure: false,
+    secure: false,  // TODO configure
     requireTLS: true,
     auth: {
-        user: "floatie.ai@gmail.com",
+        user: ACCOUNT_EMAIL,
         pass: config.emailPassword
     }
 });
 
 const TEMPLATE_DIR = path.join(__dirname + '/../templates')
-const ACCOUNT_EMAIL = 'floatie.ai@gmail.com'
 const LOGO_ATTACHMENT = {
     filename: 'logo.png',
     path: __dirname +'/../assets/logo.png',
@@ -28,6 +33,13 @@ const verifyTemplate = handlebars.compile(verifyTemplateSource)
 const resetPasswordTemplateSource = fs.readFileSync(path.join(TEMPLATE_DIR, "/resetPassword.handlebars"), "utf8")
 const resetPasswordTemplate = handlebars.compile(resetPasswordTemplateSource)
 
+/**
+ * Sends an account verification email for a user
+ * 
+ * @param {String} token the email token for the url
+ * @param {String} email the user's email to send to
+ * @param {String} host the url host to verify the account
+ */
 module.exports.sendVerificationEmail = async (token, email, host) => {
     const htmlToSend = verifyTemplate({ 
         url: "http://" + host + "/api/v1/verify/" + token
@@ -42,6 +54,12 @@ module.exports.sendVerificationEmail = async (token, email, host) => {
     smtpTransport.sendMail(mailOptions)
 }
 
+/**
+ * Sends a temporary password email
+ * 
+ * @param {String} token the temporary password in the email
+ * @param {String} email the user's email to send to
+ */
 module.exports.sendForgotPasswordEmail = async (token, email) => {
     const htmlToSend = resetPasswordTemplate({ 
         token: token

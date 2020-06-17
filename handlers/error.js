@@ -1,3 +1,6 @@
+/**
+ * Middleware for catching and returning errors 
+ */
 module.exports.catchErrors = (fn) => {
   return function (req, res, next) {
     return fn(req, res, next).catch((err) => {

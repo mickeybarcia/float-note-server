@@ -27,6 +27,17 @@ module.exports.decryptUser = (user, dataKey) => {
     return user
 }
 
+module.exports.getDataKeyForUser = async (userId) => {
+    const encryptedDataKey = await module.exports.getEncryptedDataKeyForUser(userId)
+    const dataKey = await keyService.decryptDataKey(encryptedDataKey).catch(err => { throw err })
+    return dataKey
+}
+
+module.exports.getEncryptedDataKeyForUser = async (userId) => {
+    const user = await userService.getUserById(userId)
+    return user.encryptedDataKey
+}
+
 module.exports.convertModelToObject = (model) => {
     return model.toObject({ getters: true })
 }

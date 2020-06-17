@@ -1,9 +1,16 @@
+/**
+ * Request validation middleware
+ */
+
 const JoiBase = require("@hapi/joi");
 const JoiDate = require("@hapi/joi-date");
 const BadRequestError = require('../error/badRequestError')
 
 const Joi = JoiBase.extend(JoiDate); 
 
+/**
+ * Validates the request based on the schema for the endpoint
+ */
 async function validateRequest(req, res, next, requestSchema) {
     const validations = ['headers', 'params', 'query', 'body']
         .map(key => {
@@ -129,7 +136,8 @@ module.exports.validateEntriesRequest = (req, res, next) => {
         query: Joi.object().keys({
             startDate: Joi.date().format("YYYY-MM-DD"),
             endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')),
-        }),  
+            page: Joi.number()
+        })
     }
     return validateRequest(req, res, next, entriesSchema);
 };
@@ -146,7 +154,8 @@ module.exports.validateEntryRequest = (req, res, next) => {
 module.exports.validateEntryImageRequest = (req, res, next) => {
     const entrySchema = { 
         params: Joi.object().keys({
-            location: Joi.string().required()
+            location: Joi.string().required(),
+            entryId: Joi.string().required()
         })        
     }
     return validateRequest(req, res, next, entrySchema);

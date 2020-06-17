@@ -20,14 +20,10 @@ const {
 const userApi = require('./user');
 const entryApi = require('./entry');
 const summaryApi = require('./summary');
-
 var router = require('express').Router();
+
 const upload = multer({
     storage: multer.memoryStorage(),
-});
-
-router.get('/', function(req, res) {
-    res.send("welcome to floatie!");
 });
 
 // TODO - split up
@@ -111,7 +107,7 @@ router.post(
     catchErrors(entryApi.addEntry)
 );
 router.get(
-    '/entries/:page', 
+    '/entries', 
     verifyToken, 
     catchErrors(validateEntriesRequest), 
     catchErrors(entryApi.getEntries)
@@ -136,7 +132,7 @@ router.get(
     catchErrors(entryApi.getEntry)
 );
 router.get(
-    '/entries/images/:location', 
+    '/entries/:entryId/images/:location', 
     verifyToken, 
     catchErrors(validateEntryImageRequest), 
     catchErrors(entryApi.getEntryImage)

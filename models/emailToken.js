@@ -1,3 +1,4 @@
+
 var { encryptPassword } = require('../handlers/encryptor')
 var mongoose = require('mongoose');
 
@@ -24,7 +25,7 @@ module.exports.EmailToken = mongoose.model('EmailToken', tokenSchema);
 
 var passwordTokenSchema = tokenSchema;
 
-passwordTokenSchema.pre('save', function(next) {
+passwordTokenSchema.pre('save', (next) => {
     var passwordToken = this;
     passwordToken.token = encryptPassword(passwordToken.token);
     next();

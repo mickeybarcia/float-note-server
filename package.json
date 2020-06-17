@@ -4,7 +4,7 @@
   "description": "floatie main backend",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_PATH= node app.js",
+    "start": "NODE_PATH= nodemon app.js",
     "test": "jest --config ./jest.config.json"
   },
   "author": "mickeydbarcia",
@@ -36,10 +36,11 @@
     "joi": "^14.3.1",
     "joi-date-extensions": "^1.2.0",
     "jsonwebtoken": "^8.4.0",
-    "mongoose": "^5.9.7",
+    "mongoose": "^5.9.19",
     "mongoose-unique-validator": "^2.0.2",
     "multer": "^1.4.1",
     "node-cache": "^5.1.0",
+    "nodemon": "^2.0.4",
     "npm": "^6.14.5"
   },
   "devDependencies": {

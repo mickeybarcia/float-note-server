@@ -1,9 +1,14 @@
+/**
+ * App configurations for different environments
+ */
+
 const dotenv = require('dotenv');
 dotenv.config();
-const env = process.env.NODE_ENV;
+
+const ENV = process.env.NODE_ENV;
 
 const local = {
-    env: env,
+    env: ENV,
     app: {
         port: 8080
     },
@@ -33,7 +38,7 @@ const local = {
 };
 
 const development = {
-    env: env,
+    env: ENV,
     app: {
         port: 8080
     },
@@ -65,7 +70,7 @@ const development = {
 const test = development
 
 const production = {
-    env: env,
+    env: ENV,
     app: {
         port: 8080
     },
@@ -100,4 +105,4 @@ const config = {
     production
 };
 
-module.exports = config[env];
+module.exports = config[ENV];

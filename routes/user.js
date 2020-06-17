@@ -12,7 +12,7 @@ const encryptor = require('../handlers/encryptor')
 const emailTokenService = require('../services/emailToken')
 const keyService = require('../services/key') 
 const userService = require('../services/user')
-const userUtil = require('../util/user')
+const userUtil = require('../utils/user')
 
 /**
  * Get the user object for the authenticated user
@@ -57,11 +57,12 @@ module.exports.login = async (req, res, next) => {
 module.exports.register = async (req, res, next) => {
     const user = await userService.getUserByUsername(req.body.username);
     // TODO - check email uniqueness
-    if (!user) {
+    if (!user) {  // the username is unique
         const encryptedDataKey = await keyService.generateDataKey().catch(err => { throw err })
         const dataKey = await keyService.decryptDataKey(encryptedDataKey).catch(err => { throw err })
         const [ 
-            encryptedGender, encryptedMentalHealthStatus 
+            encryptedGender, 
+            encryptedMentalHealthStatus 
         ] = userUtil.getEncryptedUserValues(dataKey, req.body.mentalHealthStatus, req.body.gender)
         const user = await userService.createUser(
             req.body.username,

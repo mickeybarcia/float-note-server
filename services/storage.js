@@ -11,7 +11,7 @@ function saveImages(images) {
     let promises = []
     images.forEach((file) => {
         // console.log(Math.round(file.size/1024) +'KB')
-        const filename = Date.now() + file.originalname
+        const filename = file.url
         const blob = bucket.file(filename)
         const newPromise =  new Promise((resolve, reject) => {
             blob.createWriteStream({
