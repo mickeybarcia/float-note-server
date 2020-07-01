@@ -24,7 +24,8 @@ async function validateRequest(req, res, next, requestSchema) {
             req.validated = Object.assign({},...result);
             next();
         }).catch(validationError => {
-            const message = validationError.details.map(d => d.message);
+            // TODO - remove escaped quotes
+            const message = validationError.details.map(d => d.message).join('. ');
             throw new BadRequestError(message);
         });
 };
@@ -65,6 +66,16 @@ module.exports.validateCreateEntryRequest = (req, res, next) => {
     return validateRequest(req, res, next, entrySchema);
 }
 
+module.exports.validateResetPasswordRequest = (req, res, next) => {
+    const resetPasswordSchema = { 
+        body: Joi.object().keys({
+            password: Joi.string().required(),
+            confirmPassword: Joi.string().valid(Joi.ref('password')).required()
+        })
+    }
+    return validateRequest(req, res, next, resetPasswordSchema);
+};
+
 module.exports.validateProfileRequest = (req, res, next) => {
     const profileUpdateSchema = { 
         body: Joi.object().keys({
@@ -96,9 +107,8 @@ module.exports.validateForgotPasswordRequest = (req, res, next) => {
 module.exports.validateUpdatePasswordRequest = (req, res, next) => {
     const updatePasswordSchema = { 
         body: Joi.object().keys({
-            usernameOrEmail: Joi.string().required(),
             oldPassword: Joi.string().required(),
-            newPassword: Joi.string().required()
+            newPassword:  Joi.string().disallow(Joi.ref('oldPassword')).required()
         })
     }
     return validateRequest(req, res, next, updatePasswordSchema);
@@ -113,24 +123,6 @@ module.exports.validateEmailRequest = (req, res, next) => {
     return validateRequest(req, res, next, updateEmailSchema);
 };
 
-module.exports.validateVerifyEmailRequest = (req, res, next) => {
-    const verifyEmailSchema = { 
-        params: Joi.object().keys({
-            token: Joi.string().required()
-        })
-    }
-    return validateRequest(req, res, next, verifyEmailSchema);
-};
-
-module.exports.resendEmailRequest = (req, res, next) => {
-    const resendEmailSchema = { 
-        body: Joi.object().keys({
-            email: Joi.string().required()
-        })
-    }
-    return validateRequest(req, res, next, resendEmailSchema);
-};
-
 module.exports.validateEntriesRequest = (req, res, next) => {
     const entriesSchema = { 
         query: Joi.object().keys({
@@ -140,25 +132,6 @@ module.exports.validateEntriesRequest = (req, res, next) => {
         })
     }
     return validateRequest(req, res, next, entriesSchema);
-};
-
-module.exports.validateEntryRequest = (req, res, next) => {
-    const entriesSchema = { 
-        params: Joi.object().keys({
-            entryId: Joi.string().required()
-        })        
-    }
-    return validateRequest(req, res, next, entriesSchema);
-};
-
-module.exports.validateEntryImageRequest = (req, res, next) => {
-    const entrySchema = { 
-        params: Joi.object().keys({
-            location: Joi.string().required(),
-            entryId: Joi.string().required()
-        })        
-    }
-    return validateRequest(req, res, next, entrySchema);
 };
 
 module.exports.validateSummaryRequest = (req, res, next) => {

@@ -23,11 +23,11 @@ module.exports.getAllEntriesByUserIdAndDateRange = (userId, startDate, endDate) 
     return Entry.find({ 
         userId: userId ,
         date: { "$gte": startDate, "$lte": endDate }
-    })
+    }).exec();
 }
 
-module.exports.getEntryById = (entryId) => {
-    return Entry.findById(entryId).exec();
+module.exports.getEntryById = (entryId, decrypt=true) => {
+    return Entry.findById(entryId, null, { decrypt }).exec();
 }
 
 module.exports.saveEntryMetadata = (userId, title, date, form) => {
@@ -35,9 +35,8 @@ module.exports.saveEntryMetadata = (userId, title, date, form) => {
         userId : userId,
         title: title,
         date: date,
-        form: form,
-        text: ""
-    });
+        form: form
+    })
 }
 
 module.exports.saveEntry = (userId, title, date, text, score, form, keywords) => {
@@ -52,10 +51,10 @@ module.exports.saveEntry = (userId, title, date, text, score, form, keywords) =>
     });
 }
 
-module.exports.deleteEntryById = (id) => {
-    return Entry.findByIdAndRemove(id).exec();
+module.exports.deleteEntry = (entry) => {
+    return entry.remove()
 }
 
-module.exports.editEntry = (entryId, newData) => {
-    return Entry.findOneAndUpdate({ _id: entryId }, { $set: newData }, { new: true });
+module.exports.editEntry = (entry, newData) => {
+    return entry.set(newData).save();
 }

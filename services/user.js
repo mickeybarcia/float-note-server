@@ -1,25 +1,20 @@
 const User = require('../models/user');
 
-module.exports.getUserById = (userId) => {
-    return User.findById(userId, { password: 0 });
-}
-
-module.exports.getUserByIdWithPassword = (userId) => {
-    return User.findById(userId);
+module.exports.getUserById = (id, decrypt=true) => {
+    return User.findById(id, null, { decrypt });
 }
 
 module.exports.getUserByUsername = (username) => {
-    return User.findOne({ username: username });
+    return User.findOne({ username });
 }
 
 module.exports.getUserByEmail = (email) => {
-    return User.findOne({ email: email });
+    return User.findOne({ email });
 }
 
 module.exports.createUser = (
     username, 
     email, 
-    encryptedDataKey, 
     password, 
     mentalHealthStatus, 
     gender, 
@@ -29,38 +24,30 @@ module.exports.createUser = (
         username: username,
         password: password,
         email: email,
-        encryptedDataKey: encryptedDataKey,
         mentalHealthStatus: mentalHealthStatus,
         gender: gender,
         age, age
     });
 }
 
-module.exports.updatePassword = (userId, password) => {
-    return User.findOneAndUpdate({ _id: userId }, { $set: { password: password } })
+module.exports.updatePassword = (user, password) => {
+    return user.set({ password }).save()
 }
 
 module.exports.verify = (user) => {
-    return User.findOneAndUpdate(
-        { _id: user._id },
-        { $set: { isVerified: true } }, 
-        { new: true }
-    )
+    return user.set({ isVerified: true }).save()
 }
 
-module.exports.updateProfile = (userId, newData) => {
-    return User.findOneAndUpdate({ _id: userId }, { $set: newData }, { new: true });
+module.exports.updateProfile = (user, newData) => {
+    return user.set(newData).save();
 }
 
-module.exports.updateUsername = (userId, username) => {
-    return User.findOneAndUpdate({ _id: userId }, { username: username });
+module.exports.updateUsername = (id, username) => {
+    return User.findOneAndUpdate({ _id: id }, { username });
 }
 
-module.exports.updateEmail = (userId, email) => {
-    return User.findOneAndUpdate({_id: userId}, {
-        email: email,
-        isVerified: false
-    });
+module.exports.updateEmail = (id, email) => {
+    return User.findOneAndUpdate({_id: id}, { email, isVerified: false });
 }
 
 module.exports.deleteUserById = (id) => {

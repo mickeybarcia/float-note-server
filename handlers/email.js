@@ -23,7 +23,7 @@ var smtpTransport = nodemailer.createTransport({
 const TEMPLATE_DIR = path.join(__dirname + '/../templates')
 const LOGO_ATTACHMENT = {
     filename: 'logo.png',
-    path: __dirname +'/../assets/logo.png',
+    path: __dirname +'/../public/logo.png',
     cid: 'logo'
 }
 
@@ -32,6 +32,9 @@ const verifyTemplate = handlebars.compile(verifyTemplateSource)
 
 const resetPasswordTemplateSource = fs.readFileSync(path.join(TEMPLATE_DIR, "/resetPassword.handlebars"), "utf8")
 const resetPasswordTemplate = handlebars.compile(resetPasswordTemplateSource)
+
+const confirmResetTemplateSource = fs.readFileSync(path.join(TEMPLATE_DIR, "/confirmReset.handlebars"), "utf8")
+const confirmResetTemplate = handlebars.compile(confirmResetTemplateSource)
 
 /**
  * Sends an account verification email for a user
@@ -42,9 +45,9 @@ const resetPasswordTemplate = handlebars.compile(resetPasswordTemplateSource)
  */
 module.exports.sendVerificationEmail = async (token, email, host) => {
     const htmlToSend = verifyTemplate({ 
-        url: "http://" + host + "/api/v1/verify/" + token
+        url: host + "/api/v1/verify/" + token
     })
-   var mailOptions = { 
+    var mailOptions = { 
         from: ACCOUNT_EMAIL, 
         to: email, 
         subject: 'FLOAT NOTE 🖋 Account Verification', 
@@ -57,17 +60,34 @@ module.exports.sendVerificationEmail = async (token, email, host) => {
 /**
  * Sends a temporary password email
  * 
- * @param {String} token the temporary password in the email
+ * @param {String} token the token for the reset url
  * @param {String} email the user's email to send to
  */
-module.exports.sendForgotPasswordEmail = async (token, email) => {
+module.exports.sendForgotPasswordEmail = async (token, email, host) => {
     const htmlToSend = resetPasswordTemplate({ 
-        token: token
+        url: host + "/api/v1/auth/resetPassword/" + token
     })
-   var mailOptions = { 
+    var mailOptions = { 
         from: ACCOUNT_EMAIL, 
         to: email, 
         subject: 'FLOAT NOTE 🖋 Password Reset', 
+        html: htmlToSend,
+        attachments: [ LOGO_ATTACHMENT ]
+    };
+    smtpTransport.sendMail(mailOptions)
+}
+
+/**
+ * Notify user of password change
+ * 
+ * @param {String} email the user's email to send to
+ */
+module.exports.sendPasswordChangeEmail = async (email) => {
+    const htmlToSend = confirmResetTemplate({})
+    var mailOptions = { 
+        from: ACCOUNT_EMAIL, 
+        to: email, 
+        subject: 'FLOAT NOTE 🖋 Password Changed', 
         html: htmlToSend,
         attachments: [ LOGO_ATTACHMENT ]
     };

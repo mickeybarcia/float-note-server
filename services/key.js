@@ -8,34 +8,26 @@ const kms = new aws.KMS({
   });
   
   async function generateDataKey() {
-    return new Promise((resolve, reject) => {
-      const params = {
-          KeyId: config.kms.masterkeyId, 
-          KeySpec: 'AES_256'
-      };
-      kms.generateDataKey(params, (err, data) => {
-          if (err) {
-              reject(Error('Unable to generate data key: ' + err.name));
-          } else {
-              resolve(data.CiphertextBlob);
-          }
-      });
-    });
+    try {
+        const params = {
+            KeyId: config.kms.masterkeyId, 
+            KeySpec: 'AES_256'
+        }
+        let data = await kms.generateDataKey(params).promise();
+        return data.CiphertextBlob
+      } catch (err) {
+        throw Error('Unable to generate data key: ' + err.name)
+      }
   }
 
   async function decryptDataKey(buffer) {
-    return new Promise((resolve, reject) => {
-        const params = {
-            CiphertextBlob: buffer
-        };
-        kms.decrypt(params, (err, data) => {
-            if (err) {
-                reject(Error('Unable to decrypt data key: ' + err.name));
-            } else {
-                resolve(data.Plaintext);
-            }
-        });
-    });
+    try {
+        const params = { CiphertextBlob: buffer };
+        const data = await kms.decrypt(params).promise()
+        return data.Plaintext
+    } catch (err) {
+        throw new Error('Unable to decrypt data key: ' + err.name)
+    }
 }
 
 module.exports = { 

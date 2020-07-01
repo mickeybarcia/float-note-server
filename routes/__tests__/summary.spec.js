@@ -8,18 +8,18 @@ const {
     NEXT, 
     ENC_DATA_KEY, 
     DATA_KEY, 
-    USER_ID,
     TEXT,
     LONG_DEC_TEXT,
     ENC_ENTRY,
     START_DATE,
     END_DATE
-} = require('./constants')
+} = require('../../__tests__/entryConstants')
+const { USER_ID } = require('../../__tests__/userConstants')
 
-jest.mock('../services/key');
-jest.mock('../services/entry');
-jest.mock('../services/ai');
-jest.mock('../handlers/encryptor');
+jest.mock('../../services/key');
+jest.mock('../../services/entry');
+jest.mock('../../services/ai');
+jest.mock('../../handlers/encryptor');
 
 const RESPONSE = { send: jest.fn() }
 const SUMMARY = { summary: 'summary' }

@@ -10,16 +10,14 @@ const {
     validateForgotPasswordRequest,
     validateUpdatePasswordRequest,
     validateEmailRequest,
-    resendEmailRequest,
     validateSummaryRequest,
     validateEntriesRequest,
-    validateEntryRequest,
-    validateEntryImageRequest,
-    validateVerifyEmailRequest
+    validateResetPasswordRequest
 } = require('../handlers/validator');
 const userApi = require('./user');
 const entryApi = require('./entry');
 const summaryApi = require('./summary');
+
 var router = require('express').Router();
 
 const upload = multer({
@@ -42,10 +40,19 @@ router.post(
 router.post(
     '/auth/forgotPassword', 
     catchErrors(validateForgotPasswordRequest), 
-    catchErrors(userApi.forgotPassword)
+    catchErrors(userApi.sendForgotPassword)
+);
+router.get( 
+    '/auth/resetPassword/:token', 
+    catchErrors(userApi.renderResetPassword)
+);
+router.post(
+    '/auth/resetPassword/:token', 
+    catchErrors(validateResetPasswordRequest),
+    catchErrors(userApi.resetPassword)
 );
 router.put(
-    '/auth/resetPassword', 
+    '/user/password', 
     verifyToken,  
     catchErrors(validateUpdatePasswordRequest), 
     catchErrors(userApi.updatePassword)
@@ -66,7 +73,7 @@ router.post(
     '/user/username', 
     verifyToken, 
     catchErrors(validateUsernameRequest), 
-    catchErrors(userApi.validateUsername)
+    catchErrors(userApi.checkUsername)
 );
 router.put(
     '/user/username', 
@@ -89,13 +96,11 @@ router.put(
 router.get(
     '/verify/:token', 
     verifyToken, 
-    catchErrors(validateVerifyEmailRequest), 
     catchErrors(userApi.verifyEmail)
-);  // TODO rename
+);
 router.post(
     '/verify', 
     verifyToken, 
-    catchErrors(resendEmailRequest), 
     catchErrors(userApi.sendVerification)
 );
 
@@ -115,7 +120,6 @@ router.get(
 router.put(
     '/entries/:entryId', 
     verifyToken, 
-    catchErrors(validateEntryRequest), 
     upload.array('page', 12), 
     catchErrors(entryApi.editEntry)
 ); // TODO: seperate endpoint
@@ -128,19 +132,16 @@ router.post(
 router.get(
     '/entries/:entryId', 
     verifyToken, 
-    catchErrors(validateEntryRequest), 
     catchErrors(entryApi.getEntry)
 );
 router.get(
     '/entries/:entryId/images/:location', 
     verifyToken, 
-    catchErrors(validateEntryImageRequest), 
     catchErrors(entryApi.getEntryImage)
 );
 router.delete(
     '/entries/:entryId', 
     verifyToken, 
-    catchErrors(validateEntryRequest), 
     catchErrors(entryApi.deleteEntry)
 );
 

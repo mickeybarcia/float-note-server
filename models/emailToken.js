@@ -1,6 +1,6 @@
 
-var { encryptPassword } = require('../handlers/encryptor')
 var mongoose = require('mongoose');
+var { encryptPassword, random } = require('../handlers/encryptor')
 
 const tokenSchema = new mongoose.Schema({
     userId: { 
@@ -11,7 +11,8 @@ const tokenSchema = new mongoose.Schema({
     },
     token: { 
         type: String, 
-        required: true 
+        required: true,
+        default: random()
     },
     createdAt: { 
         type: Date, 
@@ -24,11 +25,5 @@ const tokenSchema = new mongoose.Schema({
 module.exports.EmailToken = mongoose.model('EmailToken', tokenSchema);
 
 var passwordTokenSchema = tokenSchema;
-
-passwordTokenSchema.pre('save', (next) => {
-    var passwordToken = this;
-    passwordToken.token = encryptPassword(passwordToken.token);
-    next();
-})
 
 module.exports.PasswordToken = mongoose.model('PasswordToken', passwordTokenSchema);

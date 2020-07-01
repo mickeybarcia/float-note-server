@@ -1,27 +1,31 @@
 const { PasswordToken, EmailToken } = require('../models/emailToken');
 
-function createEmailToken(userId, token) {
-    return EmailToken.create({userId: userId, token: token});
+function createEmailToken(userId) {
+    return EmailToken.create({ userId });
 }
 
-function createPasswordToken(userId, token) {
-    return PasswordToken.create({ userId: userId, token: token });
+function createPasswordToken(userId) {
+    return PasswordToken.create({ userId });
 }
 
 function getPasswordTokenByUserId(userId) {
-    return PasswordToken.findOne({ userId: userId });
+    return PasswordToken.findOne({ userId });
 }
 
 function getEmailToken(token) {
-    return EmailToken.findOne({ token: token });
+    return EmailToken.findOne({ token });
+}
+
+function getPasswordToken(token) {
+    return PasswordToken.findOne({ token });
 }
 
 function deletePasswordTokenByUserId(userId) {
-    return PasswordToken.findOneAndDelete({ userId: userId });
+    return PasswordToken.deleteOne({ userId });
 }
 
 function deleteEmailTokenByUserId(userId) {
-    return EmailToken.findOneAndDelete({ userId: userId });
+    return EmailToken.deleteOne({ userId });
 }
 
 module.exports = { 
@@ -30,5 +34,6 @@ module.exports = {
     createPasswordToken, 
     getEmailToken, 
     getPasswordTokenByUserId, 
-    deletePasswordTokenByUserId 
+    deletePasswordTokenByUserId,
+    getPasswordToken
 }

@@ -9,10 +9,8 @@ const userUtil = require('../../utils/user')
 const entryRoute = require('../entry')
 const { getShortDate } = require('../../utils/date')
 const { 
-    NEXT, 
     ENC_DATA_KEY, 
     DATA_KEY, 
-    USER_ID,
     ENC_TITLE,
     ENC_TEXT,
     ENC_SCORE,
@@ -36,17 +34,19 @@ const {
     ENC_IMAGE_BUFFER,
     IMAGE_BUFFER,
     ENTRY_ID
-} = require('./constants')
+} = require('../../__tests__/entryConstants')
+const { USER_ID } = require('../../__tests__/userConstants')
 
 // mocks
-jest.mock('../services/entry');
-jest.mock('../services/ai');
-jest.mock('../services/storage');
-jest.mock('../services/key');
-jest.mock('../handlers/encryptor');
-jest.mock('../utils/entry');
+jest.mock('../../services/entry');
+jest.mock('../../services/ai');
+jest.mock('../../services/storage');
+jest.mock('../../services/key');
+jest.mock('../../handlers/encryptor');
+jest.mock('../../utils/entry');
 
 let RESPONSE = { send: jest.fn() }
+let NEXT = () => {}
 
 describe('add entry', () => {
     RESPONSE.location = jest.fn()

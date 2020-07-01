@@ -1,7 +1,5 @@
-module.exports.NEXT = () => {}
 module.exports.ENC_DATA_KEY = 'xxkeyxx'
 module.exports.DATA_KEY = 'key'
-module.exports.USER_ID = '123'
 module.exports.ENTRY_ID = '456'
 module.exports.START_DATE = '2000-01-01'
 module.exports.END_DATE = '2001-01-01'

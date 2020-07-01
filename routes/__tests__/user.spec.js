@@ -7,57 +7,36 @@ const emailHandler = require('../../handlers/email')
 const userUtil = require('../../utils/user')
 const authHandler = require('../../handlers/auth')
 const UnAuthorizedError = require('../../error/unauthorizedError')
-const { NEXT, ENC_DATA_KEY, DATA_KEY, USER_ID } = require('./constants')
+const { ENC_DATA_KEY, DATA_KEY } = require('../../__tests__/entryConstants')
+const {
+  USER_ID,
+  USERNAME,
+  EMAIL,
+  PASSWORD,
+  MENTAL_HEALTH_STATUS,
+  GENDER,
+  AGE,
+  REGISTER_REQ_BODY,
+  ENC_MENTAL_HEALTH_STATUS,
+  ENC_GENDER,
+  ENC_TEST_USER,
+  DEC_TEST_USER,
+  EMAIL_TOKEN_VALUE,
+  EMAIL_TOKEN,
+  AUTH_TOKEN,
+  HOST
+} = require('../../__tests__/userConstants')
 
-jest.mock('../services/user');
-jest.mock('../services/key');
-jest.mock('../handlers/encryptor');
-jest.mock('../handlers/email');
-jest.mock('../services/emailToken')
-jest.mock('../utils/user');
-jest.mock('../handlers/auth');
+jest.mock('../../services/user');
+jest.mock('../../services/key');
+jest.mock('../../handlers/encryptor');
+jest.mock('../../handlers/email');
+jest.mock('../../services/emailToken')
+jest.mock('../../utils/user');
+jest.mock('../../handlers/auth');
 
 const RESPONSE = { send: jest.fn() }
-const USERNAME = "username"
-const EMAIL = "test@test.com"
-const PASSWORD = "password"
-const MENTAL_HEALTH_STATUS = "status"
-const GENDER = "gender"
-const AGE = 15
-const REGISTER_REQ_BODY = {
-  username: USERNAME,
-  email: EMAIL,
-  password: PASSWORD,
-  mentalHealthStatus: MENTAL_HEALTH_STATUS,
-  gender: GENDER,
-  age: AGE
-}
-const ENC_PASSWORD = "xxpasswordxx"
-const ENC_MENTAL_HEALTH_STATUS = 'xxstatus'
-const ENC_GENDER = 'xxgenderxx'
-const ENC_TEST_USER = {
-  _id: USER_ID,
-  username: USERNAME,
-  email: EMAIL,
-  password: ENC_PASSWORD,
-  mentalHealthStatus: ENC_MENTAL_HEALTH_STATUS,
-  gender: ENC_GENDER,
-  age: AGE,
-  encryptedDataKey: ENC_DATA_KEY
-}
-const DEC_TEST_USER = {
-  _id: USER_ID,
-  username: USERNAME,
-  email: EMAIL,
-  password: ENC_PASSWORD,
-  mentalHealthStatus: MENTAL_HEALTH_STATUS,
-  gender: GENDER,
-  age: AGE
-}
-const EMAIL_TOKEN_VALUE = 'emailToken'
-const EMAIL_TOKEN = { token: EMAIL_TOKEN_VALUE }
-const AUTH_TOKEN = 'authToken'
-const HOST = 'host'
+let NEXT = () => {}
 
 describe('register', () => {
   const req = {

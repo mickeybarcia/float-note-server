@@ -4,7 +4,7 @@
 module.exports.catchErrors = (fn) => {
   return function (req, res, next) {
     return fn(req, res, next).catch((err) => {
-      logError(err, req);
+      module.exports.logError(err, req);
       if (err.res) { 
         err.status = err.res.status; 
       }
@@ -13,7 +13,7 @@ module.exports.catchErrors = (fn) => {
   }
 };
 
-function logError(err, req) {
+module.exports.logError = (err, req) => {
   console.log({
     error: err.message,
     stack: err.stack,
