@@ -18,7 +18,8 @@ module.exports.createUser = (
     password, 
     mentalHealthStatus, 
     gender, 
-    age
+    age,
+    decrypt=true
 ) => {
     return new User({
         username: username,
@@ -27,7 +28,7 @@ module.exports.createUser = (
         mentalHealthStatus: mentalHealthStatus,
         gender: gender,
         age, age
-    }).save({ decrypt: true })
+    }).save({ decrypt })
 }
 
 module.exports.updatePassword = (user, password) => {
@@ -38,8 +39,8 @@ module.exports.verify = (user) => {
     return user.set({ isVerified: true }).save()
 }
 
-module.exports.updateProfile = (user, newData) => {
-    return user.set(newData).save({ decrypt: true });
+module.exports.updateProfile = (user, newData, decrypt=true) => {
+    return user.set(newData).save({ decrypt });
 }
 
 module.exports.updateUsername = (id, username) => {

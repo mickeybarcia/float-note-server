@@ -107,7 +107,7 @@ describe('create and edit entry', () => {
         textRes = await request(app).post('/api/v1/entries/images')
             .set('Authorization', await getToken())
             .attach('page', path.join(__dirname, '/constants/invalidImage.png'))
-        expect(textRes.body.text.text).to.equal('')
+        expect(textRes.body.text).to.equal('')
     }))
 })
 

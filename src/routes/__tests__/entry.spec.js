@@ -10,7 +10,6 @@ const aiService = require('../../services/ai');
 const storageService = require('../../services/storage');
 const userService = require('../../services/user');
 const entryRoute = require('../entry')
-const { getShortDate } = require('../../utils/date')
 const { decryptDataKey } = require('../../services/key') 
 const { decryptAesBuffer } = require('../../handlers/encryptor')
 const { 
@@ -100,8 +99,8 @@ describe('get entries', () => {
         await entryRoute.getEntries(req, RESPONSE, NEXT)
         expect(entryService.getEntriesByUserIdAndDateRange).toBeCalledWith(
             USER_ID, 
-            getShortDate(START_DATE), 
-            getShortDate(END_DATE), 
+            new Date(START_DATE), 
+            new Date(END_DATE), 
             10, 
             1
         )

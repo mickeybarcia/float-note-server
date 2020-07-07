@@ -3,7 +3,6 @@ const aiService = require('../services/ai');
 const userService = require('../services/user')
 const storageService = require('../services/storage');
 const { decryptDataKey } = require('../services/key');
-const { getDate, getShortDate } = require('../utils/date')
 const { encryptAesBuffer, decryptAesBuffer } = require('../handlers/encryptor')
 const NotFoundError = require('../error/notFoundError')
 const config = require('../config');
@@ -19,8 +18,8 @@ module.exports.getEntries = async (req, res, next) => {
     if (req.query.startDate && req.query.endDate) {
         entries = await entryService.getEntriesByUserIdAndDateRange(
             req.userId, 
-            getShortDate(req.query.startDate), 
-            getShortDate(req.query.endDate), 
+            new Date(req.query.startDate), 
+            new Date(req.query.endDate), 
             RESULTS_PER_PAGE, 
             page
         );
@@ -46,13 +45,14 @@ module.exports.getEntry = async (req, res, next) => {
  */
 module.exports.addEntry = async (req, res, next) => {
     const form = req.body.form
+    const date = req.body.date ? new Date(req.body.date) : new Date()
     if (form == "text") {  // upload whole entry
         const text = req.body.text
         const mlRes = await aiService.analyzeEntry(text)
         var entry = await entryService.saveEntry(
             req.userId, 
             req.body.title, 
-            getDate(req.body.date), 
+            date, 
             text, 
             mlRes.score.toString(), 
             form, 
@@ -62,7 +62,7 @@ module.exports.addEntry = async (req, res, next) => {
         var entry = await entryService.saveEntryMetadata(
             req.userId, 
             req.body.title, 
-            getDate(req.body.date), 
+            date, 
             form
         )
     }
@@ -96,7 +96,7 @@ module.exports.editEntry = async (req, res, next) => {
                 await storageService.saveImage(image)  // save the images 
             })
         } catch (err) {  // delete the meta data if image upload fails
-            if (config.env == 'production') await entryService.deleteEntry(entry);
+            await entryService.deleteEntry(entry);
             throw err;
         }
     } else {  // you are editing the entry fields
@@ -154,5 +154,5 @@ module.exports.deleteEntry =  async (req, res, next) => {
  */
 module.exports.getImageText = async (req, res, next) => {
     const text = await aiService.getImageText(req.file);
-    res.send({ text });
+    res.send({ text: text.text });
 }

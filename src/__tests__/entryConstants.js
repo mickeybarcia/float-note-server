@@ -3,8 +3,8 @@ const Entry = require('../models/entry')
 
 module.exports.DATA_KEY = 'key'
 module.exports.ENTRY_ID = '456'
-module.exports.START_DATE = '1990-01-01'
-module.exports.END_DATE = '2030-01-01'
+module.exports.START_DATE = '2010-07-06T19:52:57.282Z'
+module.exports.END_DATE = '2030-07-06T19:52:57.282Z'
 module.exports.IMAGE_URL = 'image.png'
 module.exports.TEXT_FORM = "text"
 module.exports.IMAGE_FORM = "image"
@@ -12,7 +12,7 @@ module.exports.TEXT = `happy happy sad sad`
 module.exports.TITLE = 'title'
 module.exports.SCORE = "0.2"
 module.exports.KEYWORDS = ['sad', 'happy']
-module.exports.DATE = new Date('2000-01-03T02:02:20.326Z')
+module.exports.DATE = new Date('2010-07-06T19:52:57.282Z')
 module.exports.LONG_TEXT = `happy happy sad sad sad DAD MAD LAD sad sad happy (?) sad sad sad
 RAD sad dad BAD happ happy happy happy happy happy sad sad sad DAD
 MAD LAD sad sad happy (?) sad sad sad RAD sad dad BAD happ happy happy happy`

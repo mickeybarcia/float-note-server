@@ -21,7 +21,7 @@ describe('register and login', () => {
         
         // register token works, can get correct decrypted user
         var userRes = await request(app).get('/api/v1/user').set('Authorization', registerRes.body.token)
-        expect(userRes.body.age).to.equal(REGISTER_REQ_BODY.age)
+        expect(String(userRes.body.age)).to.equal(REGISTER_REQ_BODY.age)
 
         // login works
         const loginRes = await request(app).post('/api/v1/auth/login').send({ 

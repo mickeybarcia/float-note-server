@@ -1,45 +1,52 @@
 const Entry = require('../models/entry');
 
-module.exports.getEntriesByUserId = (userId, resPerPage, page) => {
-    return Entry.find({ userId: userId }, null, { decrypt: true })
+module.exports.getEntriesByUserId = (userId, resPerPage, page, decrypt=true) => {
+    return Entry.find({ userId: userId }, null, { decrypt })
         .skip((resPerPage * page) - resPerPage)
         .limit(resPerPage)
         .sort('-date')
         .exec();
 }
 
-module.exports.getEntriesByUserIdAndDateRange = (userId, startDate, endDate, resPerPage, page) => {
+module.exports.getEntriesByUserIdAndDateRange = (
+    userId, 
+    startDate, 
+    endDate, 
+    resPerPage, 
+    page, 
+    decrypt=true
+) => {
     return Entry.find({ 
         userId: userId,
         date: { "$gte": startDate, "$lte": endDate }
-    }, null, { decrypt: true })
+    }, null, { decrypt })
         .skip((resPerPage * page) - resPerPage)
         .limit(resPerPage)
         .sort('-date')
         .exec();
 }
 
-module.exports.getAllEntriesByUserIdAndDateRange = (userId, startDate, endDate) => {
+module.exports.getAllEntriesByUserIdAndDateRange = (userId, startDate, endDate, decrypt=true) => {
     return Entry.find({ 
         userId: userId ,
         date: { "$gte": startDate, "$lte": endDate }
-    }, null, { decrypt: true }).exec();
+    }, null, { decrypt }).exec();
 }
 
 module.exports.getEntryById = (entryId, decrypt=true) => {
     return Entry.findById(entryId, null, { decrypt }).exec();
 }
 
-module.exports.saveEntryMetadata = (userId, title, date, form) => {
+module.exports.saveEntryMetadata = (userId, title, date, form, decrypt=true) => {
     return new Entry({
             userId,
             title,
             date,
             form
-        }).save({ decrypt: true })
+        }).save({ decrypt })
 }
 
-module.exports.saveEntry = (userId, title, date, text, score, form, keywords) => {
+module.exports.saveEntry = (userId, title, date, text, score, form, keywords, decrypt=true) => {
     return new Entry({
             userId,
             title,
@@ -48,13 +55,13 @@ module.exports.saveEntry = (userId, title, date, text, score, form, keywords) =>
             score,
             form,
             keywords
-        }).save({ decrypt: true })
+        }).save({ decrypt })
 }
 
 module.exports.deleteEntry = (entry) => {
     return entry.remove()
 }
 
-module.exports.editEntry = (entry, newData) => {
-    return entry.set(newData).save({ decrypt: true });
+module.exports.editEntry = (entry, newData, decrypt=true) => {
+    return entry.set(newData).save({ decrypt });
 }

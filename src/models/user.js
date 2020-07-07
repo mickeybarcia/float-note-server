@@ -86,6 +86,7 @@ userSchema.post("findOne", async function(doc, next) {
 userSchema.options.toObject = {
     transform: function(doc, ret, options) {
         ret.id = ret._id;
+        ret.age = Number(ret.age)
         delete ret._id
         delete ret.encryptedDataKey;
         delete ret.password;

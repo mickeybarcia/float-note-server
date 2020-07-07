@@ -109,7 +109,8 @@ entrySchema.methods.setToPlaintext = function(fieldName) {
 entrySchema.options.toObject = {
     transform: function(doc, ret, options) {
         ret.id = ret._id;
-        ret.score = Number(ret.score)
+        if (ret.score) ret.score = Number(ret.score)
+        if (!ret.text) ret.text = ''
         delete ret._id
         delete ret.encryptedDataKey;
         delete ret.password;

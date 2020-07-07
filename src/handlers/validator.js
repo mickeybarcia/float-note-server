@@ -126,8 +126,8 @@ module.exports.validateEmailRequest = (req, res, next) => {
 module.exports.validateEntriesRequest = (req, res, next) => {
     const entriesSchema = { 
         query: Joi.object().keys({
-            startDate: Joi.date().format("YYYY-MM-DD"),
-            endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')),
+            startDate: Joi.date().iso(),
+            endDate: Joi.date().iso().min(Joi.ref('startDate')),
             page: Joi.number()
         })
     }
@@ -137,8 +137,8 @@ module.exports.validateEntriesRequest = (req, res, next) => {
 module.exports.validateSummaryRequest = (req, res, next) => {
     const summarySchema = { 
         query: Joi.object().keys({
-            startDate: Joi.date().format("YYYY-MM-DD").required(),
-            endDate: Joi.date().format("YYYY-MM-DD").min(Joi.ref('startDate')).required(),
+            startDate: Joi.date().iso().required(),
+            endDate: Joi.date().iso().min(Joi.ref('startDate')).required(),
             sentences: Joi.number().required()
         })         
     }
