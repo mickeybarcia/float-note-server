@@ -9,7 +9,7 @@ const entryService = require('../services/entry');
  * Gets a summary of the entry text in a date range for a user
  */
 module.exports.getSummary = async (req, res, next) => {
-    const entries = await entryService.getEntriesByUserIdAndDateRange(
+    const entries = await entryService.getAllEntriesByUserIdAndDateRange(
         req.userId,
         new Date(req.query.startDate),
         new Date(req.query.endDate)

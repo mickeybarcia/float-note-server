@@ -20,14 +20,14 @@ const imageStorage = {
 const kms = {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    dataMasterKeyId: proccess.env.DATA_MASTER_KEY_ID
+    dataMasterKeyId: process.env.DATA_MASTER_KEY_ID
 }
 
 const devServices = {
-    ...kms,
+    kms: { ...kms },
     emailPassword: process.env.EMAIL_PASSWORD,
     testUserId: "5f00bfe620c4ca57491f6564",
-    dbUrl: 'mongodb+srv://' + proccess.env.DB_USER + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + '/integration?retryWrites=true&w=majority',
+    dbUrl: 'mongodb+srv://' + process.env.DB_USER + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + '/integration?retryWrites=true&w=majority',
     imageStorage: {
         ...imageStorage,
         projectId: "floatnote-staging"
@@ -45,7 +45,7 @@ const local = {
         port: 8080
     },
     mlApi: {
-        url:  'http://127.0.0.1:5000',
+        url: 'http://127.0.0.1:5000',
         key: process.env.ML_API_KEY
     }
 };
@@ -64,16 +64,16 @@ const development = {
 
 var test = {...development}
 test.env = 'test'
-test.dbUrl = 'mongodb+srv://' + proccess.env.DB_USER + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + '/integration?retryWrites=true&w=majority'
+test.dbUrl = 'mongodb+srv://' + process.env.DB_USER + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + '/integration?retryWrites=true&w=majority'
 
 const production = {
-    ...kms,
     env: ENV,
     app: {
         port: 8080
     },
+    kms: { ...kms },
     emailPassword: process.env.EMAIL_PASSWORD,
-    dbUrl: 'mongodb+srv://' + proccess.env.DB_USER + ':' + process.env.DB_PASSWORD + '@' + proccess.env.DB_HOST + '/' + proccess.env.DB_NAME + '?retryWrites=true&w=majority',
+    dbUrl: 'mongodb+srv://' + process.env.DB_USER + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + '/' + process.env.DB_NAME + '?retryWrites=true&w=majority',
     mlApi: {
         url: 'https://float-note-ml-api.herokuapp.com',
         key: process.env.ML_API_KEY
