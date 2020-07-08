@@ -1,7 +1,6 @@
 /**
  * App configurations for different environments
  */
-
 const dotenv = require('dotenv');
 dotenv.config();
 

@@ -18,6 +18,7 @@ const { isEmail } = require('../utils/email')
  * Get the user object for the authenticated user
  */
 module.exports.getCurrentUser = async (req, res, next) => {
+    console.log(req.userId)
     let user = await userService.getUserById(req.userId);
     if (!user) throw new BadRequestError('User not found');
     res.send(user.toObject());
