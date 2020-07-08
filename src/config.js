@@ -27,7 +27,7 @@ const devServices = {
     kms: { ...kms },
     emailPassword: process.env.EMAIL_PASSWORD,
     testUserId: "5f00bfe620c4ca57491f6564",
-    dbUrl: 'mongodb+srv://' + process.env.DB_USER + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + '/integration?retryWrites=true&w=majority',
+    dbUrl: 'mongodb+srv://' + process.env.DB_USER + ':' + process.env.DB_PASSWORD + '@' + process.env.DB_HOST + '/' + process.env.DB_NAME + '?retryWrites=true&w=majority',
     imageStorage: {
         ...imageStorage,
         projectId: "floatnote-staging"
