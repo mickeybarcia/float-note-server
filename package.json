@@ -4,7 +4,7 @@
   "description": "floatie main backend",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=development nodemon ./src/app.js",
+    "start": "nodemon ./src/app.js",
     "test:unit": "jest --config ./src/jest.config.json",
     "test:int": "NODE_ENV=test mocha ./src/**/*.test.js --recursive --exit --timeout 10000"
   },
