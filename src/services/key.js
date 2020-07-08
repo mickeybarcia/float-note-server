@@ -10,7 +10,7 @@ const kms = new aws.KMS({
 async function generateDataKey() {
   try {
       const params = {
-          KeyId: config.kms.masterkeyId, 
+          KeyId: config.kms.dataMasterKeyId, 
           KeySpec: 'AES_256'
       }
       let data = await kms.generateDataKey(params).promise();
@@ -19,6 +19,8 @@ async function generateDataKey() {
       throw Error('Unable to generate data key: ' + err.name)
     }
 }
+
+
 
 async function decryptDataKey(buffer) {
   try {

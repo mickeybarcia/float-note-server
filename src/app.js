@@ -46,7 +46,7 @@ app.use((err, req, res, next) => {
 })
 
 // health endpoint
-app.get('/', () => {
+app.get('/', (req, res, next) => {
   res.send("welcome to floatie!");
 });
 
