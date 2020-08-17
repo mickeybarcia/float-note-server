@@ -1,10 +1,10 @@
 'use strict';
 
-module.exports = function NotFoundError(message) {
+module.exports = function TooManyRequests(retrySecs) {
   Error.captureStackTrace(this, this.constructor);
   this.name = this.constructor.name;
-  this.message = message;
-  this.status = 404;
+  this.retrySecs = retrySecs;
+  this.status = 429;
 };
 
 require('util').inherits(module.exports, Error);

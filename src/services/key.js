@@ -16,7 +16,7 @@ async function generateDataKey() {
       let data = await kms.generateDataKey(params).promise();
       return data.CiphertextBlob
     } catch (err) {
-      throw Error('Unable to generate data key: ' + err.name)
+      throw new Error('Unable to generate data key: ' + err.message)
     }
 }
 
@@ -28,7 +28,7 @@ async function decryptDataKey(buffer) {
       const data = await kms.decrypt(params).promise()
       return data.Plaintext
   } catch (err) {
-      throw new Error('Unable to decrypt data key: ' + err.name)
+      throw new Error('Unable to decrypt data key: ' + err.message)
   }
 }
 

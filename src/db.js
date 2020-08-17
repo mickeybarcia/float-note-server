@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const config = require('./config')
+const mongoose = require('mongoose');
+const config = require('./config');
 
 if (config.env != 'test') {
   mongoose.connect(config.dbUrl, {  // TODO - make seperate module

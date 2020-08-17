@@ -38,4 +38,4 @@ module.exports = class Cache {
   flush() {
     this.cache.flushAll();
   }
-}
+};

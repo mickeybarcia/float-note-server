@@ -4,16 +4,22 @@ html
         title= title
         link(rel='stylesheet', href='/stylesheets/style.css' type='text/css')
     body
-        form(name='resetPassword', method='POST', onsubmit="return validateForm()")
-            legend Reset Password
-            .form-group
-                label(for='password') New Password
-                input.form-control(type='password', name='password', value='', placeholder='New password', autofocus=true)
-            .form-group
-                label(for='confirm') Confirm Password
-                input.form-control(type='password', name='confirmPassword', value='', placeholder='Confirm password')
-            .form-group
-                button.btn.btn-primary(type='submit') Update Password
+        div(class='container')
+            form(name='resetPassword', method='POST', onsubmit="return validateForm()")
+                div(class='container')
+                    img(src='/logo.png')
+                    h2 float note
+                h3 Reset Password
+                p password must contain at least 6 characters and include a number
+                br
+                .form-group
+                    label(for='password') New Password
+                    input.form-control(type='password', name='password', value='', placeholder='New password', autofocus=true)
+                .form-group
+                    label(for='confirm') Confirm Password
+                    input.form-control(type='password', name='confirmPassword', value='', placeholder='Confirm password')
+                .form-group
+                    button.btn.btn-primary(type='submit') UPDATE PASSWORD
 
 script.
     function validateForm() {

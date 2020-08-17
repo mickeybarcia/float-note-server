@@ -6,7 +6,7 @@ module.exports.getEntriesByUserId = (userId, resPerPage, page, decrypt=true) => 
         .limit(resPerPage)
         .sort('-date')
         .exec();
-}
+};
 
 module.exports.getEntriesByUserIdAndDateRange = (
     userId, 
@@ -24,18 +24,18 @@ module.exports.getEntriesByUserIdAndDateRange = (
         .limit(resPerPage)
         .sort('-date')
         .exec();
-}
+};
 
 module.exports.getAllEntriesByUserIdAndDateRange = (userId, startDate, endDate, decrypt=true) => {
     return Entry.find({ 
         userId: userId ,
         date: { "$gte": startDate, "$lte": endDate }
     }, null, { decrypt }).exec();
-}
+};
 
 module.exports.getEntryById = (entryId, decrypt=true) => {
     return Entry.findById(entryId, null, { decrypt }).exec();
-}
+};
 
 module.exports.saveEntryMetadata = (userId, title, date, form, decrypt=true) => {
     return new Entry({
@@ -43,8 +43,8 @@ module.exports.saveEntryMetadata = (userId, title, date, form, decrypt=true) => 
             title,
             date,
             form
-        }).save({ decrypt })
-}
+        }).save({ decrypt });
+};
 
 module.exports.saveEntry = (userId, title, date, text, score, form, keywords, decrypt=true) => {
     return new Entry({
@@ -55,13 +55,13 @@ module.exports.saveEntry = (userId, title, date, text, score, form, keywords, de
             score,
             form,
             keywords
-        }).save({ decrypt })
-}
+        }).save({ decrypt });
+};
 
 module.exports.deleteEntry = (entry) => {
-    return entry.remove()
-}
+    return entry.remove();
+};
 
 module.exports.editEntry = (entry, newData, decrypt=true) => {
     return entry.set(newData).save({ decrypt });
-}
+};

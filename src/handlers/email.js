@@ -58,7 +58,7 @@ module.exports.sendVerificationEmail = async (token, email, host) => {
 }
 
 /**
- * Sends a temporary password email
+ * Sends a forgot password email
  * 
  * @param {String} token the token for the reset url
  * @param {String} email the user's email to send to

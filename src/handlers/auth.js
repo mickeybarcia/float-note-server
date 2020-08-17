@@ -4,10 +4,10 @@
 
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-const { random } = require('./encryptor')
-const UnAuthorizedError = require('../error/unauthorizedError')
+const { random } = require('./encryptor');
+const UnAuthorizedError = require('../error/unauthorizedError');
 
-const SECRET = random()
+const SECRET = random();
 
 /**
  * Checks if there is a token
@@ -26,16 +26,16 @@ module.exports.verifyToken = (req, res, next) => {
     }
     try {
       var decoded = jwt.verify(token, SECRET);
-      req.userId = decoded.id;
-      next();
     } catch(err) {
-      throw new UnAuthorizedError('Invalid token')
+      throw new UnAuthorizedError('Invalid token');
     }
+    req.userId = decoded.id;
+    next();
   } else {
     req.userId = config.testUserId;
     next();
   }
-}
+};
 
 /**
  * Signs a JWT 
@@ -44,4 +44,4 @@ module.exports.verifyToken = (req, res, next) => {
  */
 module.exports.generateJWT = (userId) => {
   return jwt.sign({ id: userId }, SECRET, { expiresIn: 86400 });
-}
+};

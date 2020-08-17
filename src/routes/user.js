@@ -2,11 +2,10 @@
  * The endpoints for authenticating, accessing, and modifying users 
  */
 
-const path = require("path")
 const UnAuthorizedError = require('../error/unauthorizedError')
 const NotFoundError = require('../error/notFoundError')
 const BadRequestError = require('../error/badRequestError')
-const { logError } = require('../handlers/error')
+const { logError, logErrorMessage } = require('../handlers/error')
 const emailHandler = require('../handlers/email')
 const { generateJWT } = require('../handlers/auth')
 const { checkPassword } = require('../handlers/encryptor')
@@ -18,7 +17,6 @@ const { isEmail } = require('../utils/email')
  * Get the user object for the authenticated user
  */
 module.exports.getCurrentUser = async (req, res, next) => {
-    console.log(req.userId)
     let user = await userService.getUserById(req.userId);
     if (!user) throw new BadRequestError('User not found');
     res.send(user.toObject());
@@ -31,11 +29,12 @@ module.exports.getCurrentUser = async (req, res, next) => {
  */
 module.exports.login = async (req, res, next) => {
     const user = await getUserByUsernameOrEmail(req.body.usernameOrEmail);
-    if (!user) throw new UnAuthorizedError('Username or email not correct');
-    if (checkPassword(req.body.password, user.password)) {
-        res.send({ token: generateJWT(user._id) });
+    if (user && checkPassword(req.body.password, user.password)) {
+        // resetLimiter(req.body.usernameOrEmail, req.ip)
+        res.send({ token: generateJWT(user._id) })
     } else {
-        throw new UnAuthorizedError('Password not correct');
+        // checkFailedLogin(req.body.usernameOrEmail, req.ip)
+        throw new UnAuthorizedError('Username, email, or password not correct');
     }
 }
 
@@ -84,7 +83,6 @@ async function getUserByUsernameOrEmail(usernameOrEmail) {
  */
 module.exports.updateProfile = async (req, res, next) => {
     var user = await userService.getUserById(req.userId)
-    if (!user) throw new BadRequestError('User not found');
     user = await userService.updateProfile(user, req.body);
     res.send(user.toObject());
 }
@@ -143,13 +141,28 @@ module.exports.updateEmail = async (req, res, next) => {
   * Verfies user can access their email
   */
 module.exports.verifyEmail = async (req, res, next) => {
-    const token = await emailTokenService.getEmailToken(req.params.token)
-    if (!token) throw new BadRequestError('Token invalid or expired');
-    const user = await userService.getUserById(token.userId, false); 
-    if (!user) throw new NotFoundError('User not found'); 
-    if (user.isVerified) throw new BadRequestError('Account verified already');
-    await userService.verify(user);
-    res.sendFile(path.join(__dirname, '../views/verifyAccountSuccess.html'));
+    try {
+        const token = await emailTokenService.getEmailToken(req.params.token)
+        if (!token) throw new NotFoundError('Token invalid or expired')
+        const user = await userService.getUserById(token.userId, false); 
+        if (!user) throw NotFoundError('User not found')
+    } catch (err) {
+        logError(err, req)
+        res.render('error', { error: 'Unable to update password. Token may be invalid or expired...' })
+        return
+    }
+    if (user.isVerified) {
+        logErrorMessage('User already verified', req)
+        res.render('error', { error:  'User already verified...' })
+        return
+    }
+    try {
+        await userService.verify(user);
+    } catch (err) {
+        logError(err, req)
+        res.render('error', { error: 'Unable to verify user. Try resending the verification email later...' })
+    }
+    res.render('verified')
 }
 
 /**
@@ -170,11 +183,17 @@ module.exports.sendVerification = async (req, res, next) => {
  * Renders page to create new password for users who forgot theirs
  */
 module.exports.renderResetPassword = async (req, res, next) => {
-    const token = await emailTokenService.getPasswordToken(req.params.token)
-    if (token) {
-        res.render('reset')
-    } else {
-        throw new NotFoundError("A password reset is not active")
+    try {
+        const token = await emailTokenService.getPasswordToken(req.params.token)
+        if (token) {
+            res.render('reset')
+            return
+        } else {
+            throw NotFoundError('Token invalid or expired')
+        }
+    } catch (err) {
+        logError(err, req) 
+        res.render('error', { error: 'Token may be invalid or expired...' })
     }
 }
 
@@ -189,9 +208,10 @@ module.exports.resetPassword = async (req, res, next) => {
         user = await userService.getUserById(token.userId); 
         if (!user) throw new NotFoundError('User not found'); 
         await userService.updatePassword(user, req.body.password)
-    } catch (err) {  // TODO - apply to front end methods
+    } catch (err) {
         logError(err, req) 
         res.render('error', { error: 'Unable to update password. Token may be invalid or expired...' })
+        return
     }
     emailTokenService.deletePasswordTokenByUserId(user._id) 
     emailHandler.sendPasswordChangeEmail(user.email)

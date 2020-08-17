@@ -1,6 +1,7 @@
-const multer  = require('multer')
+const multer  = require('multer');
 const { catchErrors } = require('../handlers/error');
 const { verifyToken } = require('../handlers/auth');
+const { checkUsernameRate } = require('../handlers/rateLimiter')
 const { 
     validateLoginRequest, 
     validateRegisterRequest, 
@@ -18,19 +19,18 @@ const userApi = require('./user');
 const entryApi = require('./entry');
 const summaryApi = require('./summary');
 
-var router = require('express').Router();
+var router = require('express').Router();  // TODO - split up
 
 const upload = multer({
     storage: multer.memoryStorage(),
 });
-
-// TODO - split up
 
 /**
  * Auth API
  */
 router.post(  // Authenticate user
     '/auth/login', 
+    // catchErrors(checkUsernameRate),
     catchErrors(validateLoginRequest), 
     catchErrors(userApi.login)
 );
@@ -43,6 +43,11 @@ router.post(  // Send forgot password email
     '/auth/forgotPassword', 
     catchErrors(validateForgotPasswordRequest), 
     catchErrors(userApi.sendForgotPassword)
+);
+router.post(  // Check if username exists
+    '/auth/username', 
+    catchErrors(validateUsernameRequest), 
+    catchErrors(userApi.checkUsername)
 );
 router.get(  // Render reset password page
     '/auth/resetPassword/:token', 
@@ -76,12 +81,6 @@ router.patch(  // Edit user profile
     verifyToken,
     catchErrors(validateProfileRequest), 
     catchErrors(userApi.updateProfile)
-);
-router.post(  // Check is username exists
-    '/user/username', 
-    verifyToken, 
-    catchErrors(validateUsernameRequest), 
-    catchErrors(userApi.checkUsername)
 );
 router.put(  // Update username
     '/user/username', 
@@ -157,7 +156,8 @@ router.get(  // Get entries summary
     '/summary', 
     verifyToken, 
     catchErrors(validateSummaryRequest), 
-    catchErrors(summaryApi.getSummary)
+    summaryApi.getSummary
+    // catchErrors(summaryApi.getSummary)
 );
 
 module.exports = router;

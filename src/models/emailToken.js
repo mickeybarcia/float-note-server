@@ -1,6 +1,6 @@
 
 var mongoose = require('mongoose');
-var { random } = require('../handlers/encryptor')
+var { random } = require('../handlers/encryptor');
 
 const tokenSchema = new mongoose.Schema({
     userId: { 

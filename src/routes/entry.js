@@ -131,7 +131,7 @@ module.exports.getEntryImage = async (req, res, next) => {
         res.type('png');
         res.end(decBuffer);
     } else {
-        throw new Error('Image does not exist for this user');
+        throw new NotFoundError('Image does not exist for this user');
     }
 }
 

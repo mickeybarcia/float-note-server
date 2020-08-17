@@ -1,11 +1,26 @@
 h1 { 
-    font-family:'Avenir Next'
+    font-family:'Avenir Next';
+    color: #2D9CFF;
+    font-size: 54px;
 }
 h2 {
-    font-family:'Avenir Next'
+    font-family:'Avenir Next';
+    font-size: 48px;
+    color: #2D9CFF;
+}
+h3 {
+    font-family:'Avenir Next';
+    font-size: 28px;
+}
+.error {
+    font-family:'Avenir Next';
+    font-size: 36px;
+    color: red;
+    font-style: italic;
 }
 p {
-    font-family:'Avenir Next'
+    font-family:'Avenir Next';
+    font-style: italic;
 }
 a {
     font-family:'Avenir Next'
@@ -14,5 +29,30 @@ form {
     font-family:'Avenir Next'
 }
 button {
-    font-family:'Avenir Next'
+    font-family: 'AvenirNext-DemiBold';
+    background-color: #2D9CFF;
+    color: white;
+    border: none;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 20px;
+}
+.form-group {
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column
+}
+.container {
+    display: flex;
+    margin: 40px;
+    align-items: center;
+    flex-direction: column;
+}
+input.form-control { 
+    width: 500px;
+    font-size: 18px;
+    font-family:'Avenir Next';
+}
+.form-group label {
+    font-family: 'AvenirNext-DemiBold';
 }

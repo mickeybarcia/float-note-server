@@ -56,7 +56,7 @@ const development = {
         port: 8080
     },
     mlApi: {
-        url: 'https://float-note-ml-api.herokuapp.com',
+        url: 'https://float-note-ml-api-staging.herokuapp.com/',
         key: process.env.ML_API_KEY
     }
 };

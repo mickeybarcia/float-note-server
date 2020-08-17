@@ -2,10 +2,11 @@
  * Encrypts and decrypts stored data
  */
 
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-const ALGORITHM = 'aes-256-cbc'
+const ALGORITHM = 'aes-256-cbc';
+const SALT_ROUNDS = 8;
 
 /**
  * Generates a random string
@@ -16,7 +17,7 @@ const ALGORITHM = 'aes-256-cbc'
  */
 module.exports.random = (num=4) => {
   return crypto.randomBytes(num).toString('hex');
-}
+};
 
 /**
  * Encrypts a string
@@ -32,7 +33,7 @@ module.exports.encryptAes = (key, text) => {
   let encrypted = cipher.update(text);
   encrypted = Buffer.concat([encrypted, cipher.final()]);
   return iv.toString('hex') + ':' + encrypted.toString('hex');
-} 
+}; 
 
 /**
  * Decrypts a string
@@ -49,7 +50,7 @@ module.exports.decryptAes = (key, text) => {
   let decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(key), iv);
   let decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
   return decrypted.toString();
-}
+};
 
 /**
  * Encrypts a buffer
@@ -64,7 +65,7 @@ module.exports.encryptAesBuffer = (key, buffer) => {
   let cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(key), iv);
 	const result = Buffer.concat([iv, cipher.update(buffer), cipher.final()]);
 	return result;
-}
+};
 
 /**
  * Decrypts a buffer
@@ -80,7 +81,7 @@ module.exports.decryptAesBuffer = (key, buffer) => {
 	var decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(key), iv);
 	var result = Buffer.concat([decipher.update(buffer), decipher.final()]);
 	return result;
-}
+};
 
 
 /**
@@ -93,7 +94,7 @@ module.exports.decryptAesBuffer = (key, buffer) => {
  */
 module.exports.checkPassword = (reqPassword, realPassword) => {
   return bcrypt.compareSync(reqPassword, realPassword);
-}
+};
 
 /**
  * Encrypts a password
@@ -103,5 +104,5 @@ module.exports.checkPassword = (reqPassword, realPassword) => {
  * @return {String}
  */
 module.exports.encryptPassword = (password) => {
-  return bcrypt.hashSync(password, 8);
-}
+  return bcrypt.hashSync(password, SALT_ROUNDS);
+};

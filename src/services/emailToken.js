@@ -36,4 +36,4 @@ module.exports = {
     getPasswordTokenByUserId, 
     deletePasswordTokenByUserId,
     getPasswordToken
-}
+};

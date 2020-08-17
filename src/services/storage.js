@@ -19,7 +19,7 @@ async function saveImage(file) {
             await blob.makePrivate()
             resolve(response)
         }).on('error', err => {
-            reject(new Error('Upload error: ' + err.message))
+            reject(new Error('Storage upload error: ' + err.message))
         }).end(file.buffer)
     });
 }
