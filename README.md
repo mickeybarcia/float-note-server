@@ -2,7 +2,8 @@
 ### the node backend API for [float note](https://github.com/mickeybarcia/floatnote)
 ## tools used
 - Node Express
-- Mongodb for the database
+- Heroku deployment
+- Mongodb and mongoose for the database
 - Amazon KMS for data encryption keys
 - Google Cloud bucket storage for journal entry images
 - InfluxDB monitoring
