@@ -141,10 +141,11 @@ module.exports.updateEmail = async (req, res, next) => {
   * Verfies user can access their email
   */
 module.exports.verifyEmail = async (req, res, next) => {
+    let user;
     try {
         const token = await emailTokenService.getEmailToken(req.params.token)
         if (!token) throw new NotFoundError('Token invalid or expired')
-        const user = await userService.getUserById(token.userId, false); 
+        user = await userService.getUserById(token.userId, false); 
         if (!user) throw NotFoundError('User not found')
     } catch (err) {
         logError(err, req)

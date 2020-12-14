@@ -11,7 +11,7 @@ describe('edit user', () => {
     beforeEach(mochaAsync(async () => saveTestUser() ))
     it('updates usernames',  mochaAsync(async () => {
         // checks if username is taken
-        usernameCheckRes = await request(app).post('/api/v1/user/username')
+        usernameCheckRes = await request(app).post('/api/v1/auth/username')
             .set('Authorization', await getToken())
             .send({ username: USERNAME })
         expect(usernameCheckRes.body.isUnique).to.equal(false)

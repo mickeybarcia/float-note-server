@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon ./src/app.js",
     "test:unit": "jest --config ./src/jest.config.json",
-    "test:int": "NODE_ENV=test mocha ./src/**/*.test.js --recursive --exit --timeout 10000"
+    "test:int": "NODE_ENV=test mocha ./src/**/*.test.js --recursive --exit --timeout 50000"
   },
   "author": "mickeydbarcia",
   "license": "ISC",

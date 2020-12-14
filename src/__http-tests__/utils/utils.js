@@ -42,7 +42,7 @@ module.exports.saveTestEntries = async (numText, numImage) => {
       text: getWordArray(20).join(' '),
       title: getWordArray(5).join(' '),
       score: Math.random(),
-      keywords: getWordArray(5).join(' '),
+      keywords: getWordArray(5),
       form: TEXT_FORM,
       userId: USER_ID
     }))
@@ -53,7 +53,7 @@ module.exports.saveTestEntries = async (numText, numImage) => {
       title: getWordArray(5).join(' '),
       form: IMAGE_FORM,
       score: Math.random(),
-      keywords: getWordArray(5).join(' '),
+      keywords: getWordArray(5),
       imageUrls: [ String(Date.now()) + '.jpg' ],
       userId: USER_ID
     }))
